@@ -1,8 +1,6 @@
 # Waterfall process method
 
 ## Table of Contents
-- [Waterfall process method](#waterfall-process-method)
-  - [Table of Contents](#table-of-contents)
   - [Requirements](#requirements)
   - [Design](#design)
     - [Design restraints](#design-restraints)
