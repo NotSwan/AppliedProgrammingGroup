@@ -14,6 +14,7 @@ Erik Haynes
 	- Creating new software may be unnecessary if existing software fulfills the above requirements 
 - Review existing database tools (MySQL, MongoDB, Oracle RDBMS, etc.)
 	- Building a database from scratch is unnecessary when many database tools already exist
+	- Assess if the existing solutions allow for expansions of features through development of extensions to allow for a best of both worlds approach if there is no one  pre existing solution that hits all the check boxes
 ## Requirements Modification
 -Revise original program specs based on the functionality and limitations of the available software solutions
 ## System Design with Reuse

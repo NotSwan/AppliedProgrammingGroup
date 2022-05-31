@@ -14,6 +14,7 @@ Erik Haynes
 
 ## System Software and Design
 - Pick a programming language for the program to be written in
+  - This decision will be influenced by the requirements such as speed and maintainability 
 - Establish what database software will be used to store all the data
 - Pick user interface - desktop, browser or mobile application
 - Locate current repository of student, instructor, admin, and course information to be imported to the new system
@@ -39,6 +40,7 @@ Erik Haynes
 	 -  Create a login system to establish and enforce what permissions each user has
 	- Test that the functionality established in the unit test still works in the integrated system
 	- Test that users are unable to preform the actions of a user type they are not
+	- Test for extraneous inputs and such error handling
 
 ## Operation and Maintenance
  - Roll out the System and listen for user feedback

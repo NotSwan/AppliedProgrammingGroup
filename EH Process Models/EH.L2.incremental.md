@@ -16,3 +16,5 @@ Erik Haynes
 	- create functionality to add, view, and remove data from the database
 - Third Iteration
 	- create users and establish permissions as to what functionality from the second iteration they have access to
+- Final Iteration
+  - after a round of testing and verification to confirm there is no bugs found before shipping (the third iteration may be this but must be verified)
