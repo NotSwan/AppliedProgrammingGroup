@@ -24,7 +24,8 @@
 ## Integration and Testing
 - Combine all requirements
 - Test Thouroughly
-- Make sure permissions of each user are seperated to what is expected
+  - input types, user errors, all functions database calls, etc.
+- Make sure permissions of each user follow the requirements outlined
 - Add UI and access menu
 
 ## Operation and Maintenence
