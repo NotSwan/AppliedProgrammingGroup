@@ -23,7 +23,8 @@ To fulfill the contract we must meet these metrics
   + Support multiple semesters and printing out of schedules and scheduling preferences
 ___
 ## Component Analysis
-Decide the level of customizability the customer wants such as if they want to use a full solution (MySchool, Kiddom, PCR Educator Management System, etc.) or would like to have a custom colution where a database management system as well as custom interfacing UI would have to be created.
+Decide the level of customizability the customer wants: If they want to use a full solution (MySchool, Kiddom, PCR Educator Management System, etc.) or would like to have a custom solution where a database management system as well as custom interfacing UI would have to be created.
+[]: # (Spelling - EH)
 
 ## Requirement Modification
 + A base class of user containing ID and name
@@ -40,9 +41,11 @@ The database that stores these users will be able to store if that has changed:
 ___
 ## System Design
 Aquisition of hardware or hosting, development of data types and the user interface, and the creation of the database would occur here, or the configuration of specific DBMS with support.
+[]: # (You should make mention of how the program will need to work alongside whatever existing software solutions are being used in the project - EH)
 ___
 ## Development & Integration
-Compatibility layers between software or specific hooks into the full solution may be developed to further meet spec. Test data would be populated such that functionality can be tested and thoroughly vetted to ensure customer satisfaction
+Compatibility layers between software or specific hooks into the full solution may be developed to further meet specifications. Test data would be populated such that functionality can be tested and thoroughly vetted to ensure customer satisfaction
+[]: # (Don't use abbrevations - EH)
 ___
 
 ## Validation
