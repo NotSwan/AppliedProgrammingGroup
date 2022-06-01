@@ -1,4 +1,3 @@
-![Integration]
 
 ## Outline
  - 100 students, 10 instructors, and 1 admin
@@ -16,6 +15,7 @@
 - Look at what is required for this program
   - compare to similar existing programs
 - Review the tools that have possible use
+  - Database management systems, user interface tools, server hosting vs cloud hosting
   
 ## Requirement Modification
 - Fix up program to the best abilities of the programs and data 
