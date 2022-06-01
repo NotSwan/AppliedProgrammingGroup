@@ -2,6 +2,7 @@ Erik Haynes
 # Lab 2 - Waterfall Model
 
 ![Waterfall Model](https://i.imgur.com/N8I2IQa.png)
+[]: # (nice use of pictures - NN)
 ## Requirements Analysis and Definition
 
  - Database of users: the system must work for 100 students, 10 instructors, and 1 admin
@@ -46,3 +47,4 @@ Erik Haynes
  - Roll out the System and listen for user feedback
  - Patch any bugs that may arise
  - Look for ways that the interface can be streamlined based on how the real users end up interacting with the system.
+[]: # (What are some changes that you could be expected to add - NN)

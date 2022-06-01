@@ -33,6 +33,7 @@ ___
 ## Initial Version
 This may be the simplest version, aiming to solve the original specifcations but as development was underway their may have been changes that will have to be added and improved upon in later versions.
 []: # (Small gramatical edits for clarity - EH)
+[]: # (what would be the bare neccessities? - NN)
 ___
 ## Intermediate Versions
 Intermediate versions play the role of refining the original image and allowing the customer to shape their final product that they want while having many chances for the developers to input and aid in reaching the best final project.
@@ -40,5 +41,5 @@ ___
 
 ## Final Version
 After repeated and incremenetal development the final product should be a thoroughly vetted and refined final product.
-
+[]: # (What would you expect to be changed - NN)
 []: # (This is a good description of the steps of the incremental model, but you should try to give more of a description of how it might apply to this specific problem - EH)

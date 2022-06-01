@@ -12,8 +12,10 @@ Erik Haynes
 ## Iterations
  - First Iteration
 	- implement the basic database - tables of students, instructors, administrators, and classes
+  []: # (More specifics of what this basic class should include - NN)
 - Second Iteration
 	- create functionality to add, view, and remove data from the database
+  []: # (What could be done to add functionality - NN)
 - Third Iteration
 	- create users and establish permissions as to what functionality from the second iteration they have access to
 - Final Iteration
