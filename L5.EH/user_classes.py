@@ -58,7 +58,7 @@ class Admin(User):
         # password assignment should be resolved on first login attempt
 
         if accountType == "Admin":
-            sql = str("INSERT INTO Admin (ID, firstName, lastName, email) Values ("
+            sql = str("INSERT INTO Admin (ID, firstName, lastName, email) VALUES ("
                       + ID + ", '" + firstName + "', '" + lastName + "', '" + username + "@wit.edu')")
             print(sql)
             db.execute(sql)
@@ -66,7 +66,7 @@ class Admin(User):
                 self.update_field("Admin", ID, "office", office)
 
         if accountType == "Instructor":
-            sql = str("INSERT INTO Instructors (ID, firstName, lastName, email) Values ("
+            sql = str("INSERT INTO Instructors (ID, firstName, lastName, email) VALUES ("
                       + ID + ", '" + firstName + "', '" + lastName + "', '" + username + "@wit.edu')")
             print(sql)
             db.execute(sql)
@@ -77,7 +77,7 @@ class Admin(User):
                 self.update_field("Instructors", ID, "hireYear", str(hireYear))
 
         if accountType == "Student":
-            sql = str("INSERT INTO Students (ID, firstName, lastName, email) Values ("
+            sql = str("INSERT INTO Students (ID, firstName, lastName, email) VALUES ("
                       + ID + ", '" + firstName + "', '" + lastName + "', '" + username + "@wit.edu')")
             print(sql)
             db.execute(sql)
@@ -87,8 +87,14 @@ class Admin(User):
             if gradYear is not None:
                 self.update_field("Students", ID, "gradYear", str(gradYear))
 
+    def create_new_course(self, title, time, days, year, credits, dept):
+        CRN = str((db.execute("SELECT CRN FROM Courses ORDER BY ID DESC")).fetchone()[0] + 1)
 
-testA = Admin("Perry", "Gripp", 154)
-testA.create_new_user("Test", "Man", "Student", gradYear=2022)
-result = db.execute("SELECT * FROM Students ORDER BY ID DESC")
-print(result.fetchone()[4])
+        sql = str("INSERT INTO Courses (CRN, title, time, days, year, credits, dept) VALUES (" +
+                  str(CRN) + ", '" + title + "', " + str(time) + ", '" + days + "', " + str(year)
+                  + ", " + str(credits) + ", '" + dept + "')")
+        print(sql)
+        db.execute(sql)
+
+
+db.close()
