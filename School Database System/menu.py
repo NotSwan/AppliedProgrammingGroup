@@ -1,4 +1,4 @@
-import user_classes
+from user_classes import *
 
 
 def login():

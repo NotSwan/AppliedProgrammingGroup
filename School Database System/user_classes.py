@@ -31,7 +31,7 @@ class Instructor(User):
         self.hireYear = hireYear
 
     def print_course_roaster(self):
-        sql = str("SELECT * FROM Courses WHERE instructor ='" +self.lastName + "'")
+        sql = str("SELECT * FROM Courses WHERE instructor ='" + self.lastName + "'")
         print(sql)
         for row in db.execute(sql).fetchall():
             print(row)
@@ -63,6 +63,7 @@ class Admin(User):
             pri_key_field = 'CRN'
         else:
             pri_key_field = 'ID'
+
         sql = "UPDATE " + table + " SET " + field + " = '" + new_value + "' WHERE " + pri_key_field + " = " + pri_key
         print(sql)
         db.execute(sql)
@@ -77,37 +78,22 @@ class Admin(User):
         db.execute(sql)
 
         # new users do not get assigned a password
-        # password assignment should be resolved on first login attempt
+        # password assignment is resolved on first login attempt
 
         if accountType == "Admin":
             sql = str("INSERT INTO Admin (ID, firstName, lastName, email) VALUES ("
                       + ID + ", '" + firstName + "', '" + lastName + "', '" + username + "@wit.edu')")
-            print(sql)
-            db.execute(sql)
-            if office is not None:
-                self.update_field("Admin", ID, "office", office)
 
         if accountType == "Instructor":
             sql = str("INSERT INTO Instructors (ID, firstName, lastName, email) VALUES ("
                       + ID + ", '" + firstName + "', '" + lastName + "', '" + username + "@wit.edu')")
-            print(sql)
-            db.execute(sql)
-            if dept is not None:
-                self.update_field("Instructors", ID, "dept", dept)
-
-            if hireYear is not None:
-                self.update_field("Instructors", ID, "hireYear", str(hireYear))
 
         if accountType == "Student":
             sql = str("INSERT INTO Students (ID, firstName, lastName, email) VALUES ("
                       + ID + ", '" + firstName + "', '" + lastName + "', '" + username + "@wit.edu')")
-            print(sql)
-            db.execute(sql)
-            if major is not None:
-                self.update_field("Students", ID, "major", major)
 
-            if gradYear is not None:
-                self.update_field("Students", ID, "gradYear", str(gradYear))
+        print(sql)
+        db.execute(sql)
 
     def create_new_course(self, title, time, days, year, credits, dept):
         CRN = str((db.execute("SELECT CRN FROM Courses ORDER BY CRN DESC")).fetchone()[0] + 1)
