@@ -3,24 +3,19 @@ import sqlite3 as sql
 db = sql.connect("data2.db")
 
 
-def fetchone_and_cleanup(result):
-    print(result.fetchone()[0])
-
-
 class User:
-    def __init__(self, firstName, lastName, id):
+    def __init__(self, firstName, lastName, ID):
         self.firstName = firstName
         self.lastName = lastName
         self.fullName = firstName + " " + lastName
-        self.id = id
-        self.email = lastName + firstName[0] + "@wit.edu"
+        self.ID = ID
+        self.username = (lastName + firstName[0]).lower()
+        self.email = self.username + "@wit.edu"
 
-
-class Student(User):
-    def __init__(self, firstName, lastName, id, gradYear, major):
-        User.__init__(self, firstName, lastName, id)
-        self.gradYear = gradYear
-        self.major = major
+    def print_user_info(self):
+        print("Name: " + self.fullName)
+        print("ID: " + self.ID)
+        print("Email: " + self.email)
 
 
 class Instructor(User):
@@ -28,13 +23,40 @@ class Instructor(User):
         User.__init__(self, firstName, lastName, id)
         self.dept = None
         self.hireYear = None
-        self.courseList = []  # later these lists should be in the database, not the object
+
+    def set_dept(self, dept):
+        self.dept = dept
+
+    def set_hireYear(self, hireYear):
+        self.hireYear = hireYear
+
+    def print_course_roaster(self):
+        sql = str("SELECT * FROM Courses WHERE instructor ='" +self.lastName + "'")
+        print(sql)
+        for row in db.execute(sql).fetchall():
+            print(row)
+
+
+class Student(User):
+    def __init__(self, firstName, lastName, id, gradYear=None, major=None):
+        User.__init__(self, firstName, lastName, id)
+        self.gradYear = gradYear
+        self.major = major
+
+    def set_gradYear(self, gradYear):
+        self.gradYear = gradYear
+
+    def set_major(self, major):
+        self.major = major
 
 
 class Admin(User):
     def __init__(self, firstName, lastName, id):
         User.__init__(self, firstName, lastName, id)
         self.office = None
+
+    def set_office(self, office):
+        self.office = office
 
     def update_field(self, table, pri_key, field, new_value):
         if table == 'Courses':
@@ -47,7 +69,7 @@ class Admin(User):
 
     def create_new_user(self, firstName, lastName, accountType,
                         office=None, dept=None, hireYear=None, major=None, gradYear=None):
-        username = str(lastName + firstName[0])
+        username = (str(lastName + firstName[0])).lower()
         ID = str((db.execute("SELECT ID FROM Logins ORDER BY ID DESC")).fetchone()[0] + 1)
         sql = str("INSERT INTO Logins (ID, accountType, username) VALUES ("
                   + ID + ", '" + accountType + "', '" + username + "')")
@@ -88,7 +110,7 @@ class Admin(User):
                 self.update_field("Students", ID, "gradYear", str(gradYear))
 
     def create_new_course(self, title, time, days, year, credits, dept):
-        CRN = str((db.execute("SELECT CRN FROM Courses ORDER BY ID DESC")).fetchone()[0] + 1)
+        CRN = str((db.execute("SELECT CRN FROM Courses ORDER BY CRN DESC")).fetchone()[0] + 1)
 
         sql = str("INSERT INTO Courses (CRN, title, time, days, year, credits, dept) VALUES (" +
                   str(CRN) + ", '" + title + "', " + str(time) + ", '" + days + "', " + str(year)
@@ -97,4 +119,5 @@ class Admin(User):
         db.execute(sql)
 
 
-db.close()
+i = Instructor("George", "Gomez", 6)
+i.print_course_roaster()
