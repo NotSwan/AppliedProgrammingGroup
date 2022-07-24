@@ -80,6 +80,55 @@ def logout():
     current_user = Guest()
 
 
+def menu_return(current_user):
+    print("enter anything to return")
+    input()
+    return menu(current_user)
+
+
+def menu(current_user):
+    print("What would you like to do?")
+    print("==========================")
+    print("view - view all courses")
+    print("search - search courses based on parameter")
+
+    if current_user.accountType == "Student":
+        print("enroll - add a course to your roster")
+        print("drop - drop a course from your roster")
+        print("roster - view the classes you are currently enrolled in")
+
+    if current_user.accountType == "Instructor":
+        print("assign - assign self to course")
+        print("remove - remove self from course")
+
+    if current_user.accountType == "Admin":
+        print("create_user - create a new user")
+        print("delete_user - delete a user")
+        print("create_course - create a new course")
+        print("delete_course - delete a course")
+        print("enroll_student - enroll a student in a course")
+        print("drop_student - drop a course from a student's roaster")
+        print("search_table - search any table")
+
+    print("logout - exit the system")
+
+    action = input(">")
+
+    if action == "view":
+        current_user.print_all_courses()
+        menu_return(current_user)
+    elif action == "search":
+        print("What field do you want to search by? (CRN, title, days, year, credits, dept, instructor)")
+        field = input(">")
+        print("Enter search term")
+        search = input(">")
+        current_user.search_courses(field, search)
+        menu_return(current_user)
+    elif action == "logout":
+        print("Logging out...")
+        return main()
+
+
 def main():
     print("Welcome to the School Database System")
     print("=====================================")
@@ -100,11 +149,13 @@ def main():
     elif selection == "2":
         current_user = Guest()
     elif selection == "3":
+        print("Exiting...")
         return
     else:
         print("Not a valid command")
         return main()
 
+    menu(current_user)
 
 
 main()

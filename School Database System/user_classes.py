@@ -1,22 +1,27 @@
 import sqlite3 as sql
+from typing import List, Any
 
-db = sql.connect("data2.db")
+try:
+    db = sql.connect("data2.db")
+except:
+    print("database could not be located - check local directory")
 
 
 def run_sql(sql):
     print("SQLite << " + sql)
     try:
         result = db.execute(sql).fetchall()
-        if result[0] is not None:
-            for row in result:
-                data = str(row)
-                data = data.replace("(", "")
-                data = data.replace(")", "")
-                data = data.replace("'", "")
-                print(data)
+        for row in result:
+            data = str(row)
+            data = data.replace("(", "")
+            data = data.replace(")", "")
+            data = data.replace("'", "")
+            print(data)
 
-    except:
-        print("SQLite returned an error")
+        db.commit()
+    except Exception as e:
+        print("SQLite error:")
+        print(e)
 
 
 class User:
@@ -39,7 +44,7 @@ class User:
         run_sql("SELECT * FROM Courses ORDER BY CRN ASC")
 
     def search_courses(self, field, search_value):
-        sql = str ("SELECT * FROM Courses WHERE " + field + " = '" + search_value + "' ORDER BY CRN ASC")
+        sql = str("SELECT * FROM Courses WHERE " + field + " = '" + search_value + "' ORDER BY CRN ASC")
         run_sql(sql)
 
 
@@ -81,6 +86,21 @@ class Student(User):
     def set_major(self, major):
         self.major = major
 
+    def enroll(self, CRN):
+        check_next_id = db.execute("SELECT enrollment_ID FROM Enrollment ORDER BY enrollment_ID DESC").fetchone()
+
+        if check_next_id is None:
+            enrollment_id = 1
+        else:
+            enrollment_id = str((check_next_id[0] + 1))
+
+        sql = str("INSERT INTO Enrollment (enrollment_ID, CRN, student_ID, student_name) VALUES ("
+                  + str(enrollment_id) + ", " + str(CRN) + ", " + str(self.ID) + ", '" + self.fullName + "')")
+        run_sql(sql)
+
+    def drop(self, CRN):
+        sql = str("DELETE FROM Enrollment WHERE CRN = " + str(CRN) + " AND student_id = " + str(self.ID))
+        run_sql(sql)
 
 class Admin(User):
     def __init__(self, firstName, lastName, id):
@@ -103,6 +123,7 @@ class Admin(User):
     def create_new_user(self, firstName, lastName, new_accountType,
                         office=None, dept=None, hireYear=None, major=None, gradYear=None):
         username = (str(lastName + firstName[0]))
+
         ID = str((db.execute("SELECT ID FROM Logins ORDER BY ID DESC")).fetchone()[0] + 1)
         sql = str("INSERT INTO Logins (ID, accountType, username) VALUES ("
                   + ID + ", '" + new_accountType + "', '" + username.lower() + "')")
@@ -153,3 +174,6 @@ class Sysadmin(Admin, Instructor, Student):
         self.major = None
         self.office = None
         self.accountType = "Sysadmin"
+
+Sysadmin().enroll(4)
+Sysadmin().drop(4)
