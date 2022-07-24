@@ -116,6 +116,12 @@ class Student(User):
         sql = str("DELETE FROM Enrollment WHERE CRN = " + str(CRN) + " AND student_id = " + str(self.ID))
         run_sql(sql)
 
+    def print_my_courses(self):
+        sql = str("SELECT Enrollment.CRN, Courses.title, Courses.time, Courses.days, Courses.instructor "
+                  + "from Enrollment INNER JOIN Courses ON Enrollment.CRN = Courses.CRN "
+                  + "WHERE Enrollment.Student_ID = " + self.ID)
+        run_sql(sql)
+
 
 class Admin(User):
     def __init__(self, firstName, lastName, id):

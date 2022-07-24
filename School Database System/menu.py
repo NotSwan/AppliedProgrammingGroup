@@ -3,11 +3,11 @@ from user_classes import *
 
 def login():
     print("Enter username:")
-    username = input(">")
+    username = input(">").lower()
     if username == "/x":
         return None
 
-    if (db.execute("SELECT ID FROM Logins WHERE username = '" + username.lower() + "'")).fetchone() is None:
+    if (db.execute("SELECT ID FROM Logins WHERE username = '" + username + "'")).fetchone() is None:
         print("User does not exist")
         print("Enter /x to return to exit")
         return login()
@@ -93,11 +93,12 @@ def menu(current_user):
     if current_user.accountType == "Student":
         print("enroll - add a course to your roster")
         print("drop - drop a course from your roster")
-        print("roster - view the classes you are currently enrolled in")
+        print("roaster - view the classes you are currently enrolled in")
 
     if current_user.accountType == "Instructor":
         print("assign - assign self to course")
         print("remove - remove self from course")
+        print("roaster - view the classes you are currently teaching")
 
     if current_user.accountType == "Admin":
         print("create_user - create a new user")
@@ -112,9 +113,10 @@ def menu(current_user):
 
     command = input(">")
 
-
     # prepare yourself for a gigantic if...elif...elif... statement
     # is there a better way to do this? Probably!
+
+    # user functions
 
     if command == "view":  # view all courses
         current_user.print_all_courses()
@@ -135,7 +137,7 @@ def menu(current_user):
     # student functions
 
     elif current_user.accountType == "Student" and command == "enroll":
-         # enroll in a course
+        # enroll in a course
         print("Enter the CRN of the course you would like to enroll in")
         CRN = input(">")
         current_user.enroll(CRN)
@@ -145,8 +147,8 @@ def menu(current_user):
         CRN = input(">")
         current_user.drop(CRN)
 
-    elif current_user.accountType == "Student" and command == "roster":
-        current_user.print_course_roaster()
+    elif current_user.accountType == "Student" and command == "roaster":
+        current_user.print_my_courses()
 
     # instructor functions
 
@@ -156,11 +158,15 @@ def menu(current_user):
         CRN = input(">")
         current_user.assign_course_instructor(CRN)
 
-    elif current_user.accountType == "Instructor" and command == "remove" :
+    elif current_user.accountType == "Instructor" and command == "remove":
         # remove self from teaching course
         print("Enter CRN of the course you are no longer teaching")
         CRN = input(">")
         current_user.remove_course_instructor(CRN)
+
+    elif current_user.accountType == "Instructor" and command == "roaster":
+        current_user.print_course_roaster()
+
 
     # admin functions
 
@@ -209,6 +215,7 @@ def menu(current_user):
             current_user.create_new_user(firstName, lastName, "Admin", office=office)
 
     elif current_user.accountType == "Admin" and command == "delete_user":
+        # delete a user from the database
         print("Enter ID of account to be deleted")
         ID = input(">")
         sql = str("SELECT accountType FROM Logins WHERE ID = " + str(ID))
@@ -216,15 +223,26 @@ def menu(current_user):
         current_user.remove_entry("Logins", ID)
         if accountType == "Student":
             table = "Students"
+            sql = str("DELETE FROM Enrollment WHERE student_ID = " + str(ID))
+            run_sql(sql)
         elif accountType == "Instructor":
             table = "Instructors"
+            lastName =(db.execute(str("SELECT lastName from Instructors WHERE ID = " + str(ID)))).fetchone()[0]
+            sql = str("UPDATE Courses SET instructor = NULL WHERE instructor = '" + lastName + "'")
+            run_sql(sql)
         elif accountType == "Admin":
             table = "Admin"
         else:
-            return1
+            return
         current_user.remove_entry(table, ID)
 
+    else:
+        print("Not a valid command - read carefully this time")
+
     # end of the gigantic if...elif... statement
+
+    return menu(current_user)
+
 
 def main(commit=False):  # main defaults to not committing the changes. run main(true) to commit
     print("Welcome to the School Database System")
