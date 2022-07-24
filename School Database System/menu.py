@@ -31,11 +31,9 @@ def login():
         else:
             print("Passwords must match")
 
-    attempts = 0
-    while attempts < 5:
+    for attempts in range(1, 6):
         print("Enter password:")
         entered_pass = input(">")
-        attempts = attempts + 1
         if entered_pass == str(password):
             ID = str((db.execute("SELECT ID FROM Logins WHERE username = '" + username + "'")).fetchone()[0])
             accountType = str(
@@ -112,24 +110,123 @@ def menu(current_user):
 
     print("logout - exit the system")
 
-    action = input(">")
+    command = input(">")
 
-    if action == "view":
+
+    # prepare yourself for a gigantic if...elif...elif... statement
+    # is there a better way to do this? Probably!
+
+    if command == "view":  # view all courses
         current_user.print_all_courses()
         menu_return(current_user)
-    elif action == "search":
+
+    elif command == "search":  # search courses
         print("What field do you want to search by? (CRN, title, days, year, credits, dept, instructor)")
         field = input(">")
         print("Enter search term")
         search = input(">")
         current_user.search_courses(field, search)
         menu_return(current_user)
-    elif action == "logout":
+
+    elif command == "logout":  # logout from system
         print("Logging out...")
         return main()
 
+    # student functions
 
-def main():
+    elif current_user.accountType == "Student" and command == "enroll":
+         # enroll in a course
+        print("Enter the CRN of the course you would like to enroll in")
+        CRN = input(">")
+        current_user.enroll(CRN)
+
+    elif current_user.accountType == "Student" and command == "drop":  # drop from a course
+        print("Enter the CRN of the course you would like to drop")
+        CRN = input(">")
+        current_user.drop(CRN)
+
+    elif current_user.accountType == "Student" and command == "roster":
+        current_user.print_course_roaster()
+
+    # instructor functions
+
+    elif current_user.accountType == "Instructor" and command == "assign":  # instructor only courses
+        # assign self to teach course
+        print("Enter the CRN of the course you will be teaching")
+        CRN = input(">")
+        current_user.assign_course_instructor(CRN)
+
+    elif current_user.accountType == "Instructor" and command == "remove" :
+        # remove self from teaching course
+        print("Enter CRN of the course you are no longer teaching")
+        CRN = input(">")
+        current_user.remove_course_instructor(CRN)
+
+    # admin functions
+
+    elif current_user.accountType == "Admin" and command == "create_user":
+        # create new user
+        print("What type of user are you creating?")
+        print("1 - Student")
+        print("2 - Instructor")
+        print("3 - Admin")
+        type = input(">")
+
+        print("Enter First Name")
+        firstName = input(">")
+        print("Enter Last Name:")
+        lastName = input(">")
+        if type == "1":  # student account
+            print("Enter Major (or NULL):")
+            major = input(">")
+            if major == "NULL" or major == "":
+                major = None
+            print("Enter Grad Year (or NULL):")
+            gradYear = input(">")
+            if gradYear == "NULL" or major == "" or not isinstance(gradYear, int):
+                gradYear = None
+
+            current_user.create_new_user(firstName, lastName, "Student", major=major, gradYear=gradYear)
+
+        elif type == "2":  # instructor account
+            print("Enter dept (or NULL):")
+            dept = input(">")
+            if dept == "NULL" or dept == "":
+                dept = None
+            print("Enter hire year (or NULL):")
+            hireYear = input(">")
+            if hireYear == "Null" or hireYear == "" or not isinstance(hireYear, int):
+                hireYear = None
+
+            current_user.create_new_user(firstName, lastName, "Instructor", dept=dept, hireYear=hireYear)
+
+        elif type == "3":  # admin account
+            print("Enter office (or NULL):")
+            office = input(">")
+            if office == "Null" or office == "":
+                office = None
+
+            current_user.create_new_user(firstName, lastName, "Admin", office=office)
+
+    elif current_user.accountType == "Admin" and command == "delete_user":
+        print("Enter ID of account to be deleted")
+        ID = input(">")
+        sql = str("SELECT accountType FROM Logins WHERE ID = " + str(ID))
+        accountType = str(db.execute(sql).fetchone()[0])
+        current_user.remove_entry("Logins", ID)
+        if accountType == "Student":
+            table = "Students"
+        elif accountType == "Instructor":
+            table = "Instructors"
+        elif accountType == "Admin":
+            table = "Admin"
+        else:
+            return1
+        current_user.remove_entry(table, ID)
+
+    # end of the gigantic if...elif... statement
+
+def main(commit=False):  # main defaults to not committing the changes. run main(true) to commit
     print("Welcome to the School Database System")
     print("=====================================")
     print("Enter 1 to login to your account")
@@ -140,7 +237,7 @@ def main():
     if selection == "1":
         current_user = login()
         if current_user is None:
-            print("/n/n")
+            print("\n\n")
             return main()
         else:
             print("Login Successful - User type: " + current_user.accountType)
@@ -156,6 +253,9 @@ def main():
         return main()
 
     menu(current_user)
+    if commit:
+        db.commit()
+        db.close()
 
 
 main()

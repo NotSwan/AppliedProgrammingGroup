@@ -1,5 +1,4 @@
 import sqlite3 as sql
-from typing import List, Any
 
 try:
     db = sql.connect("data2.db")
@@ -8,6 +7,8 @@ except:
 
 
 def run_sql(sql):
+    # the print line is good for debugging but should be removed for production
+
     print("SQLite << " + sql)
     try:
         result = db.execute(sql).fetchall()
@@ -18,7 +19,6 @@ def run_sql(sql):
             data = data.replace("'", "")
             print(data)
 
-        db.commit()
     except Exception as e:
         print("SQLite error:")
         print(e)
@@ -68,6 +68,20 @@ class Instructor(User):
     def set_hireYear(self, hireYear):
         self.hireYear = hireYear
 
+    def assign_course_instructor(self, CRN):
+        sql = str("UPDATE Courses SET instructor = '" + self.lastName + "' WHERE CRN = " + str(CRN))
+        run_sql(sql)
+
+    def remove_course_instructor(self, CRN):
+        sql = str("SELECT * FROM Courses WHERE instructor = '" + self.lastName +
+                  "' AND CRN = " + str(CRN))
+
+        if (db.execute(sql)).fetchall() == []:
+            print("You are not currently teaching that course")
+        else:
+            sql = str("UPDATE Courses SET instructor = NULL WHERE CRN = " + str(CRN))
+            run_sql(sql)
+
     def print_course_roaster(self):
         sql = str("SELECT * FROM Courses WHERE instructor = '" + self.lastName + "'")
         run_sql(sql)
@@ -102,6 +116,7 @@ class Student(User):
         sql = str("DELETE FROM Enrollment WHERE CRN = " + str(CRN) + " AND student_id = " + str(self.ID))
         run_sql(sql)
 
+
 class Admin(User):
     def __init__(self, firstName, lastName, id):
         User.__init__(self, firstName, lastName, id)
@@ -135,16 +150,27 @@ class Admin(User):
         if new_accountType == "Admin":
             sql = str("INSERT INTO Admin (ID, firstName, lastName, email) VALUES ("
                       + ID + ", '" + firstName + "', '" + lastName + "', '" + username + "@wit.edu')")
+            run_sql(sql)
+            if office is not None:
+                self.update_field("Admin", ID, "office", office)
 
         if new_accountType == "Instructor":
             sql = str("INSERT INTO Instructors (ID, firstName, lastName, email) VALUES ("
                       + ID + ", '" + firstName + "', '" + lastName + "', '" + username + "@wit.edu')")
+            run_sql(sql)
+            if dept is not None:
+                self.update_field("Instructors", ID, "dept", dept)
+            if hireYear is not None:
+                self.update_field("Instructors", ID, "hireYear", hireYear)
 
         if new_accountType == "Student":
             sql = str("INSERT INTO Students (ID, firstName, lastName, email) VALUES ("
                       + ID + ", '" + firstName + "', '" + lastName + "', '" + username + "@wit.edu')")
-
-        run_sql(sql)
+            run_sql(sql)
+            if major is not None:
+                self.update_field("Students", ID, "major", major)
+            if gradYear is not None:
+                self.update_field("Students", ID, "gradYear", gradYear)
 
     def create_new_course(self, title, time, days, year, credits, dept):
         CRN = str((db.execute("SELECT CRN FROM Courses ORDER BY CRN DESC")).fetchone()[0] + 1)
@@ -160,7 +186,7 @@ class Admin(User):
         else:
             pri_key_field = 'ID'
 
-        sql = str("DELETE FROM " + table + " WHERE " + pri_key_field + " = " + pri_key)
+        sql = str("DELETE FROM " + table + " WHERE " + pri_key_field + " = " + str(pri_key))
         run_sql(sql)
 
 
@@ -174,6 +200,3 @@ class Sysadmin(Admin, Instructor, Student):
         self.major = None
         self.office = None
         self.accountType = "Sysadmin"
-
-Sysadmin().enroll(4)
-Sysadmin().drop(4)
