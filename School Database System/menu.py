@@ -73,11 +73,6 @@ def login():
     return None
 
 
-def logout():
-    global current_user
-    current_user = Guest()
-
-
 def menu_return(current_user):
     print("enter anything to return")
     input()
@@ -103,11 +98,12 @@ def menu(current_user):
     if current_user.accountType == "Admin":
         print("create_user - create a new user")
         print("delete_user - delete a user")
-        print("create_course - create a new course")
-        print("delete_course - delete a course")
-        print("enroll_student - enroll a student in a course")
-        print("drop_student - drop a course from a student's roaster")
-        print("search_table - search any table")
+        # these will be needed eventually but not for lab 5
+        # print("create_course - create a new course")
+        # print("delete_course - delete a course")
+        # print("enroll_student - enroll a student in a course")
+        # print("drop_student - drop a course from a student's roaster")
+        # print("search_table - search any table")
 
     print("logout - exit the system")
 
@@ -216,6 +212,9 @@ def menu(current_user):
 
     elif current_user.accountType == "Admin" and command == "delete_user":
         # delete a user from the database
+
+        # most of this function should really be converted to an Admin method delete_user()
+
         print("Enter ID of account to be deleted")
         ID = input(">")
         sql = str("SELECT accountType FROM Logins WHERE ID = " + str(ID))
@@ -256,7 +255,7 @@ def main(commit=False):  # main defaults to not committing the changes. run main
         current_user = login()
         if current_user is None:
             print("\n\n")
-            return main()
+            return main(commit)
         else:
             print("Login Successful - User type: " + current_user.accountType)
             print("Welcome, " + current_user.firstName)
@@ -268,7 +267,7 @@ def main(commit=False):  # main defaults to not committing the changes. run main
         return
     else:
         print("Not a valid command")
-        return main()
+        return main(commit)
 
     menu(current_user)
     if commit:
