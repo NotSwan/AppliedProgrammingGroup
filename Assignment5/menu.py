@@ -5,7 +5,11 @@ import Assignment1_TylerSwan
 #https://wentworth.brightspace.com/d2l/le/content/24962/viewContent/297072/View
 
 global userTypes
+<<<<<<< Updated upstream
 userTypes = {"1":"Student","2":}
+=======
+userTypes = {1:"Student","2":}
+>>>>>>> Stashed changes
 
 
 # Contributors: Tyler Swan
