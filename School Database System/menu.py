@@ -212,28 +212,9 @@ def menu(current_user):
 
     elif current_user.accountType == "Admin" and command == "delete_user":
         # delete a user from the database
-
-        # most of this function should really be converted to an Admin method delete_user()
-
         print("Enter ID of account to be deleted")
-        ID = input(">")
-        sql = str("SELECT accountType FROM Logins WHERE ID = " + str(ID))
-        accountType = str(db.execute(sql).fetchone()[0])
-        current_user.remove_entry("Logins", ID)
-        if accountType == "Student":
-            table = "Students"
-            sql = str("DELETE FROM Enrollment WHERE student_ID = " + str(ID))
-            run_sql(sql)
-        elif accountType == "Instructor":
-            table = "Instructors"
-            lastName =(db.execute(str("SELECT lastName from Instructors WHERE ID = " + str(ID)))).fetchone()[0]
-            sql = str("UPDATE Courses SET instructor = NULL WHERE instructor = '" + lastName + "'")
-            run_sql(sql)
-        elif accountType == "Admin":
-            table = "Admin"
-        else:
-            return
-        current_user.remove_entry(table, ID)
+        current_user.delete_user(input(">"))
+
 
     else:
         print("Not a valid command - read carefully this time")
