@@ -33,6 +33,12 @@ class Tester(unittest.TestCase):
     def test_login_admin(self):
         self.assertIsInstance(menu.login("haynese","password","password"), user_classes.Admin)
     
+    def test_login_student(self):
+        self.assertIsInstance(menu.login("kimj","password","password"), user_classes.Student)
+
+    def test_login_instructor(self):
+        self.assertIsInstance(menu.login("eddyb","password","password"), user_classes.Instructor)
+    
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def assert_stdout_print_roster(self, expected_output ,mock_stdout):
         self.instructor.print_course_roaster()
@@ -66,10 +72,6 @@ class Tester(unittest.TestCase):
 17, English 2, 1300, TR, 2022, 4, HUMN, Popadiuk\n\
 18, Buisness Managment, 900, TR, 2022, 4, MGMT, Gomez\n\
 19, Entrepreneurship, 1130, TR, 2022, 4, MGMT, Gomez\n")
-
-
-
-
 
 if __name__ == '__main__':
     unittest.main()
