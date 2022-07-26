@@ -27,13 +27,12 @@ def login_menu():
             password = new_pass1
             db.execute("UPDATE Logins SET password = '" + password + "' WHERE username ='" + username + "'")
             print("Password set successfully")
-            return login_menu()
+            return login(username, password, password)
         else:
             print("Passwords must match")
 
     print("Enter your password")
-    entered_pass = input(">")
-    return login(username, password, entered_pass)
+    return login(username, password, input(">"))
 
 
 def login(username, password, entered_pass):
@@ -69,11 +68,6 @@ def login(username, password, entered_pass):
         return user
     print("Exiting...")
     return None
-
-def menu_return(current_user):
-    print("enter anything to return")
-    input()
-    return menu(current_user)
 
 
 def menu(current_user):
@@ -113,7 +107,6 @@ def menu(current_user):
 
     if command == "view":  # view all courses
         current_user.print_all_courses()
-        menu_return(current_user)
 
     elif command == "search":  # search courses
         print("What field do you want to search by? (CRN, title, days, year, credits, dept, instructor)")
@@ -121,7 +114,6 @@ def menu(current_user):
         print("Enter search term")
         search = input(">")
         current_user.search_courses(field, search)
-        menu_return(current_user)
 
     elif command == "logout":  # logout from system
         print("Logging out...")
@@ -159,7 +151,6 @@ def menu(current_user):
 
     elif current_user.accountType == "Instructor" and command == "roaster":
         current_user.print_course_roaster()
-
 
     # admin functions
 
@@ -210,8 +201,6 @@ def menu(current_user):
     elif current_user.accountType == "Admin" and command == "delete_user":
         # delete a user from the database
 
-        # most of this function should really be converted to an Admin method delete_user()
-
         print("Enter ID of account to be deleted")
         current_user.delete_user(input(">"))
 
@@ -240,17 +229,17 @@ def main(commit=False):  # main defaults to not committing the changes. run main
         else:
             print("Login Successful - User type: " + current_user.accountType)
             print("Welcome, " + current_user.firstName)
+            menu(current_user)
 
     elif selection == "2":
         current_user = Guest()
+        menu(current_user)
     elif selection == "3":
         print("Exiting...")
-        return
     else:
         print("Not a valid command")
         return main(commit)
 
-    menu(current_user)
     if commit:
         db.commit()
         db.close()
