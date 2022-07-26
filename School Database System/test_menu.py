@@ -17,7 +17,7 @@ from unittest.mock import patch
 class Tester(unittest.TestCase):
 
     def setUp(self):
-        self.user = user_classes.User('test','name',123)
+        self.user = user_classes.Guest()
         self.admin = user_classes.Admin('Erik','Haynes',1)
         self.instructor = user_classes.Instructor("Pat", "Lawlor", 2)
         self.maxDiff = None
@@ -28,7 +28,7 @@ class Tester(unittest.TestCase):
         self.assertEqual(mock_stdout.getvalue(), expected_output)
 
     def test_print_user_info(self):
-        self.assert_stdout_print_user_info('Name: test name\nID: 123\nEmail: namet@wit.edu\nAccount: Base User\n')
+        self.assert_stdout_print_user_info('Name: Guest User\nID: 0\nEmail: N/A\nAccount: Guest\n')
 
     def test_login_admin(self):
         self.assertIsInstance(menu.login("haynese","password","password"), user_classes.Admin)

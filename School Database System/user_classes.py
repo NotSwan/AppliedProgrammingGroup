@@ -1,9 +1,15 @@
 import sqlite3 as sql
 
 try:
-    db = sql.connect("School Database System/data2.db")
+    # works for Erik's IDE
+    db = sql.connect("data2.db")
 except:
-    print("database could not be located - check local directory")
+    try:
+        # works for Tyler's IDE
+        db = sql.connect("School Database System/data2.db")
+    except:
+        print("database could not be located - check local directory")
+
 
 
 def run_sql(sql):
