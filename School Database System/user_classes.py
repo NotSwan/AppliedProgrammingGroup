@@ -1,7 +1,7 @@
 import sqlite3 as sql
 
 try:
-    db = sql.connect("School Database System/data2.db")
+    db = sql.connect("data2.db")
 except:
     print("database could not be located - check local directory")
 
@@ -195,6 +195,24 @@ class Admin(User):
         sql = str("DELETE FROM " + table + " WHERE " + pri_key_field + " = " + str(pri_key))
         run_sql(sql)
 
+    def delete_user(self, ID):
+        sql = str("SELECT accountType FROM Logins WHERE ID = " + str(ID))
+        accountType = str(db.execute(sql).fetchone()[0])
+        self.remove_entry("Logins", ID)
+        if accountType == "Student":
+            table = "Students"
+            sql = str("DELETE FROM Enrollment WHERE student_ID = " + str(ID))
+            run_sql(sql)
+        elif accountType == "Instructor":
+            table = "Instructors"
+            lastName = (db.execute(str("SELECT lastName from Instructors WHERE ID = " + str(ID)))).fetchone()[0]
+            sql = str("UPDATE Courses SET instructor = NULL WHERE instructor = '" + lastName + "'")
+            run_sql(sql)
+        elif accountType == "Admin":
+            table = "Admin"
+        else:
+            return
+        self.remove_entry(table, ID)
 
 class Sysadmin(Admin, Instructor, Student):
     # useful class for quickly making an object to test your methods
