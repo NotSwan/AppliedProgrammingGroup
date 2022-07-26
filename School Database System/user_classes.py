@@ -1,7 +1,7 @@
 import sqlite3 as sql
 
 try:
-    db = sql.connect("data2.db")
+    db = sql.connect("School Database System/data2.db")
 except:
     print("database could not be located - check local directory")
 

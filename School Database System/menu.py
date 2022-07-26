@@ -14,7 +14,7 @@ def login_menu():
 
     password = (db.execute("SELECT password FROM Logins WHERE username = '" + username + "'")).fetchone()[0]
     print(str(password))  # printing the password is definitely a feature we should remove before launch :P
-    entered_pass = input("Password:\n>")
+
     if password is None:
         print("New User Detected")
 
@@ -30,6 +30,7 @@ def login_menu():
             return login(username, password, password)
         else:
             print("Passwords must match")
+    entered_pass = input("Password:\n>")
     return login(username, entered_pass ,password)
 
 
