@@ -11,23 +11,30 @@ except:
         print("database could not be located - check local directory")
 
 
-
-def run_sql(sql):
-    # the print line is good for debugging but should be removed for production
+def run_sql(sql, suppress=False):
+    # in addition to running the sql and printing to the standard output
+    # also outputs a list containing each line in the sqlite output
+    # and every method that calls run_sql returns that same output
+    # will be much more practical for testing
 
     print("SQLite << " + sql)
+
     try:
         result = db.execute(sql).fetchall()
-        for row in result:
-            data = str(row)
-            data = data.replace("(", "")
-            data = data.replace(")", "")
-            data = data.replace("'", "")
-            print(data)
+        if result and not suppress:  # if list is not empty
+            for row in result:
+                data = str(row)
+                data = data.replace("(", "")
+                data = data.replace(")", "")
+                data = data.replace("'", "")
+                print(data)
+
+        return result
 
     except Exception as e:
         print("SQLite error:")
         print(e)
+        return e
 
 
 class User:
@@ -47,18 +54,17 @@ class User:
         print("Account: " + self.accountType)
 
     def print_all_courses(self):
-        run_sql("SELECT * FROM Courses ORDER BY CRN ASC")
+        return run_sql("SELECT * FROM Courses ORDER BY CRN ASC")
 
     def search_courses(self, field, search_value):
         sql = str("SELECT * FROM Courses WHERE " + field + " = '" + search_value + "' ORDER BY CRN ASC")
-        run_sql(sql)
+        return run_sql(sql)
 
 
 class Guest(User):
     def __init__(self):
         User.__init__(self, "Guest", "User", 0)
         self.email = "N/A"
-        self.accountType = "Guest"
 
 
 class Instructor(User):
@@ -66,7 +72,6 @@ class Instructor(User):
         User.__init__(self, firstName, lastName, id)
         self.dept = None
         self.hireYear = None
-        self.accountType = "Instructor"
 
     def set_dept(self, dept):
         self.dept = dept
@@ -82,7 +87,7 @@ class Instructor(User):
         sql = str("SELECT * FROM Courses WHERE instructor = '" + self.lastName +
                   "' AND CRN = " + str(CRN))
 
-        if (db.execute(sql)).fetchall() == []:
+        if not run_sql(sql): # if no results
             print("You are not currently teaching that course")
         else:
             sql = str("UPDATE Courses SET instructor = NULL WHERE CRN = " + str(CRN))
@@ -90,7 +95,7 @@ class Instructor(User):
 
     def print_course_roaster(self):
         sql = str("SELECT * FROM Courses WHERE instructor = '" + self.lastName + "'")
-        run_sql(sql)
+        return run_sql(sql)
 
 
 class Student(User):
@@ -98,7 +103,6 @@ class Student(User):
         User.__init__(self, firstName, lastName, id)
         self.gradYear = gradYear
         self.major = major
-        self.accountType = "Student"
 
     def set_gradYear(self, gradYear):
         self.gradYear = gradYear
@@ -107,12 +111,12 @@ class Student(User):
         self.major = major
 
     def enroll(self, CRN):
-        check_next_id = db.execute("SELECT enrollment_ID FROM Enrollment ORDER BY enrollment_ID DESC").fetchone()
+        check_next_id = run_sql("SELECT enrollment_ID FROM Enrollment ORDER BY enrollment_ID DESC", suppress=True)
 
-        if check_next_id is None:
+        if not check_next_id:
             enrollment_id = 1
         else:
-            enrollment_id = str((check_next_id[0] + 1))
+            enrollment_id = str((check_next_id[0][0] + 1))
 
         sql = str("INSERT INTO Enrollment (enrollment_ID, CRN, student_ID, student_name) VALUES ("
                   + str(enrollment_id) + ", " + str(CRN) + ", " + str(self.ID) + ", '" + self.fullName + "')")
@@ -126,14 +130,13 @@ class Student(User):
         sql = str("SELECT Enrollment.CRN, Courses.title, Courses.time, Courses.days, Courses.instructor "
                   + "from Enrollment INNER JOIN Courses ON Enrollment.CRN = Courses.CRN "
                   + "WHERE Enrollment.Student_ID = " + self.ID)
-        run_sql(sql)
+        return run_sql(sql)
 
 
 class Admin(User):
     def __init__(self, firstName, lastName, id):
         User.__init__(self, firstName, lastName, id)
         self.office = None
-        self.accountType = "Admin"
 
     def set_office(self, office):
         self.office = office
@@ -151,7 +154,7 @@ class Admin(User):
                         office=None, dept=None, hireYear=None, major=None, gradYear=None):
         username = (str(lastName + firstName[0]))
 
-        ID = str((db.execute("SELECT ID FROM Logins ORDER BY ID DESC")).fetchone()[0] + 1)
+        ID = str(run_sql("SELECT ID FROM Logins ORDER BY ID DESC", suppress=True)[0][0] + 1)
         sql = str("INSERT INTO Logins (ID, accountType, username) VALUES ("
                   + ID + ", '" + new_accountType + "', '" + username.lower() + "')")
         run_sql(sql)
@@ -184,13 +187,14 @@ class Admin(User):
             if gradYear is not None:
                 self.update_field("Students", ID, "gradYear", gradYear)
 
+
     def create_new_course(self, title, time, days, year, credits, dept):
-        CRN = str((db.execute("SELECT CRN FROM Courses ORDER BY CRN DESC")).fetchone()[0] + 1)
+        CRN = str(run_sql("SELECT CRN FROM Courses ORDER BY CRN DESC", suppress=True)[0][0] + 1)
 
         sql = str("INSERT INTO Courses (CRN, title, time, days, year, credits, dept) VALUES (" +
                   str(CRN) + ", '" + title + "', " + str(time) + ", '" + days + "', " + str(year)
                   + ", " + str(credits) + ", '" + dept + "')")
-        run_sql(sql)
+        return run_sql(sql)
 
     def remove_entry(self, table, pri_key):
         if table == 'Courses':
@@ -199,26 +203,28 @@ class Admin(User):
             pri_key_field = 'ID'
 
         sql = str("DELETE FROM " + table + " WHERE " + pri_key_field + " = " + str(pri_key))
-        run_sql(sql)
+        return run_sql(sql)
 
     def delete_user(self, ID):
         sql = str("SELECT accountType FROM Logins WHERE ID = " + str(ID))
-        accountType = str(db.execute(sql).fetchone()[0])
+        accountType = str(run_sql(sql)[0])
         self.remove_entry("Logins", ID)
         if accountType == "Student":
             table = "Students"
             sql = str("DELETE FROM Enrollment WHERE student_ID = " + str(ID))
-            run_sql(sql)
+            sql_output = run_sql(sql)
         elif accountType == "Instructor":
             table = "Instructors"
-            lastName = (db.execute(str("SELECT lastName from Instructors WHERE ID = " + str(ID)))).fetchone()[0]
+            lastName = run_sql(str("SELECT lastName from Instructors WHERE ID = " + str(ID)))[0]
             sql = str("UPDATE Courses SET instructor = NULL WHERE instructor = '" + lastName + "'")
-            run_sql(sql)
+            sql_output = run_sql(sql)
         elif accountType == "Admin":
             table = "Admin"
+            sql_output = []
         else:
             return
-        self.remove_entry(table, ID)
+        return sql_output.extend(self.remove_entry(table, ID))
+
 
 class Sysadmin(Admin, Instructor, Student):
     # useful class for quickly making an object to test your methods

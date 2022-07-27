@@ -4,7 +4,39 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0955345e-5ca2-452a-955a-8a7915a26650" name="Changes" comment="" />
+    <list default="true" id="0955345e-5ca2-452a-955a-8a7915a26650" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../.idea/AppliedProgrammingGroup.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/AppliedProgrammingGroup.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Assignment5/Assignment1_TylerSwan.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Assignment5/Assignment1_TylerSwan.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Assignment5/assignment3.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Assignment5/assignment3.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Assignment5/menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Assignment5/menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../L5.EH/.idea/L5.EH.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../L5.EH/.idea/L5.EH.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../L5.EH/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../L5.EH/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../L5.EH/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../L5.EH/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../L5.EH/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../L5.EH/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../L5.EH/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../L5.EH/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../L5.EH/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../L5.EH/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../L5.EH/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../L5.EH/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../L5.EH/test_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/../L5.EH/test_menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../L5.EH/user_classes.py" beforeDir="false" afterPath="$PROJECT_DIR$/../L5.EH/user_classes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NN Process Models/NN Incremental.md" beforeDir="false" afterPath="$PROJECT_DIR$/../NN Process Models/NN Incremental.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NN Process Models/NN Integration.md" beforeDir="false" afterPath="$PROJECT_DIR$/../NN Process Models/NN Integration.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NN Process Models/NN Waterfall.md" beforeDir="false" afterPath="$PROJECT_DIR$/../NN Process Models/NN Waterfall.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/School Database System.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/School Database System.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_classes.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_classes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TS Process Models/Swan_incremental.md" beforeDir="false" afterPath="$PROJECT_DIR$/../TS Process Models/Swan_incremental.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TS Process Models/Swan_intergrate.md" beforeDir="false" afterPath="$PROJECT_DIR$/../TS Process Models/Swan_intergrate.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TS Process Models/Swan_waterfall.md" beforeDir="false" afterPath="$PROJECT_DIR$/../TS Process Models/Swan_waterfall.md" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,14 +54,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/haynese/Documents/GitHub/AppliedProgrammingGroup/School Database System&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/haynese/Documents/GitHub/AppliedProgrammingGroup/School Database System"
+  },
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "Python"
+    ]
   }
-}</component>
-  <component name="RunManager" selected="Python tests.Python tests in test_menu.py">
+}]]></component>
+  <component name="RunManager" selected="Python.menu">
     <configuration name="menu" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="School Database System" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -43,6 +80,27 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/menu.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="scratch_1" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="School Database System" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$APPLICATION_CONFIG_DIR$/scratches/scratch_1.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -67,8 +125,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python tests.Python tests in test_menu.py" />
         <item itemvalue="Python.menu" />
+        <item itemvalue="Python.scratch_1" />
+        <item itemvalue="Python tests.Python tests in test_menu.py" />
       </list>
     </recent_temporary>
   </component>

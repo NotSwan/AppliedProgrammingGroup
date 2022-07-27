@@ -69,45 +69,50 @@ def login_menu():
     user = login(username, entered_pass ,password)
     return user
 
+def print_menu_options(current_user):
+    print("What would you like to do?")
+    print("==========================")
+    print("menu - print the menu")
+    print("view - view all courses")
+    print("search - search courses based on parameter")
+
+    if isinstance(current_user, Student):
+        print("enroll - add a course to your roster")
+        print("drop - drop a course from your roster")
+        print("roaster - view the classes you are currently enrolled in")
+
+    if isinstance(current_user, Instructor):
+        print("assign - assign self to course")
+        print("remove - remove self from course")
+        print("roaster - view the classes you are currently teaching")
+
+    if isinstance(current_user, Admin):
+        print("create_user - create a new user")
+        print("delete_user - delete a user")
+        # these will be needed eventually but not for lab 5
+        # print("create_course - create a new course")
+        # print("delete_course - delete a course")
+        # print("enroll_student - enroll a student in a course")
+        # print("drop_student - drop a course from a student's roaster")
+        # print("search_table - search any table")
+
+    print("logout - exit the system")
+
 
 def menu(current_user):
     menu_running = True
+    print_menu_options(current_user)
     while menu_running:
-        print("What would you like to do?")
-        print("==========================")
-        print("view - view all courses")
-        print("search - search courses based on parameter")
-
-        if current_user.accountType == "Student":
-            print("enroll - add a course to your roster")
-            print("drop - drop a course from your roster")
-            print("roaster - view the classes you are currently enrolled in")
-
-        if current_user.accountType == "Instructor":
-            print("assign - assign self to course")
-            print("remove - remove self from course")
-            print("roaster - view the classes you are currently teaching")
-
-        if current_user.accountType == "Admin":
-            print("create_user - create a new user")
-            print("delete_user - delete a user")
-            # these will be needed eventually but not for lab 5
-            # print("create_course - create a new course")
-            # print("delete_course - delete a course")
-            # print("enroll_student - enroll a student in a course")
-            # print("drop_student - drop a course from a student's roaster")
-            # print("search_table - search any table")
-
-        print("logout - exit the system")
-
         command = input(">")
 
         # prepare yourself for a gigantic if...elif...elif... statement
         # is there a better way to do this? Probably!
 
         # user functions
+        if command == "menu":
+            print_menu_options(current_user)
 
-        if command == "view":  # view all courses
+        elif command == "view":  # view all courses
             current_user.print_all_courses()
 
         elif command == "search":  # search courses
@@ -117,46 +122,47 @@ def menu(current_user):
             search = input(">")
             current_user.search_courses(field, search)
 
+
         elif command == "logout":  # logout from system
             print("Logging out...")
             menu_running = False
 
         # student functions
 
-        elif current_user.accountType == "Student" and command == "enroll":
+        elif isinstance(current_user, Student) and command == "enroll":
             # enroll in a course
             print("Enter the CRN of the course you would like to enroll in")
             CRN = input(">")
             current_user.enroll(CRN)
 
-        elif current_user.accountType == "Student" and command == "drop":  # drop from a course
+        elif isinstance(current_user, Student) and command == "drop":  # drop from a course
             print("Enter the CRN of the course you would like to drop")
             CRN = input(">")
             current_user.drop(CRN)
 
-        elif current_user.accountType == "Student" and command == "roaster":
+        elif isinstance(current_user, Student) and command == "roaster":
             current_user.print_my_courses()
 
         # instructor functions
 
-        elif current_user.accountType == "Instructor" and command == "assign":  # instructor only courses
+        elif isinstance(current_user, Instructor) and command == "assign":  # instructor only courses
             # assign self to teach course
             print("Enter the CRN of the course you will be teaching")
             CRN = input(">")
             current_user.assign_course_instructor(CRN)
 
-        elif current_user.accountType == "Instructor" and command == "remove":
+        elif isinstance(current_user, Instructor) and command == "remove":
             # remove self from teaching course
             print("Enter CRN of the course you are no longer teaching")
             CRN = input(">")
             current_user.remove_course_instructor(CRN)
 
-        elif current_user.accountType == "Instructor" and command == "roaster":
+        elif isinstance(current_user, Instructor) and command == "roaster":
             current_user.print_course_roaster()
 
         # admin functions
 
-        elif current_user.accountType == "Admin" and command == "create_user":
+        elif isinstance(current_user, Admin)  and command == "create_user":
             # create new user
             print("What type of user are you creating?")
             print("1 - Student")
@@ -200,7 +206,7 @@ def menu(current_user):
 
                 current_user.create_new_user(firstName, lastName, "Admin", office=office)
 
-        elif current_user.accountType == "Admin" and command == "delete_user":
+        elif isinstance(current_user, Admin) and command == "delete_user":
             # delete a user from the database
 
             print("Enter ID of account to be deleted")
@@ -226,13 +232,14 @@ def menu(current_user):
 
         else:
             print("Not a valid command - read carefully this time")
+            print_menu_options(current_user)
 
         # end of the gigantic if...elif... statement
 
 
 def main(commit=False):  # main defaults to not committing the changes. run main(true) to commit
     running = True
-    while(running):
+    while running:
         print("Welcome to the School Database System")
         print("=====================================")
         print("login - login to your account")
