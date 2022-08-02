@@ -110,28 +110,6 @@ class Student(User):
     def set_major(self, major):
         self.major = major
 
-    def enroll(self, CRN):
-        check_next_id = run_sql("SELECT enrollment_ID FROM Enrollment ORDER BY enrollment_ID DESC", suppress=True)
-
-        if not check_next_id:
-            enrollment_id = 1
-        else:
-            enrollment_id = str((check_next_id[0][0] + 1))
-
-        sql = str("INSERT INTO Enrollment (enrollment_ID, CRN, student_ID, student_name) VALUES ("
-                  + str(enrollment_id) + ", " + str(CRN) + ", " + str(self.ID) + ", '" + self.fullName + "')")
-        run_sql(sql)
-
-    def drop(self, CRN):
-        sql = str("DELETE FROM Enrollment WHERE CRN = " + str(CRN) + " AND student_id = " + str(self.ID))
-        run_sql(sql)
-
-    def print_my_courses(self):
-        sql = str("SELECT Enrollment.CRN, Courses.title, Courses.startTime, Courses.endTime, Courses.days, Courses.instructor "
-                  + "from Enrollment INNER JOIN Courses ON Enrollment.CRN = Courses.CRN "
-                  + "WHERE Enrollment.Student_ID = " + self.ID)
-        return run_sql(sql)
-
     def check_schedule_conflicts(self):
         sql = str("SELECT Enrollment.CRN, Courses.title, Courses.startTime, Courses.endTime, Courses.days, Courses.instructor "
                   + "from Enrollment INNER JOIN Courses ON Enrollment.CRN = Courses.CRN "
@@ -172,7 +150,7 @@ class Student(User):
                             conflicts.append([course1_info, course2_info])
                             break
 
-        if not conflicts:
+        if not conflicts: # if conflicts array is empty
             print("No course conflicts found")
             return 0
         else:
@@ -182,6 +160,37 @@ class Student(User):
                 print(conflict[1])
                 print()
                 return 1
+
+    def enroll(self, CRN):
+        check_next_id = run_sql("SELECT enrollment_ID FROM Enrollment ORDER BY enrollment_ID DESC", suppress=True)
+
+        if not check_next_id:
+            enrollment_id = 1
+        else:
+            enrollment_id = str((check_next_id[0][0] + 1))
+
+        sql = str("INSERT INTO Enrollment (enrollment_ID, CRN, student_ID, student_name) VALUES ("
+                  + str(enrollment_id) + ", " + str(CRN) + ", " + str(self.ID) + ", '" + self.fullName + "')")
+        run_sql(sql)
+
+        if self.check_schedule_conflicts():
+            print("Enrollment canceled")
+            sql = str("DELETE FROM Enrollment WHERE enrollment_ID = " + str(enrollment_id))
+            run_sql(sql)
+        else:
+            print("No conflict detected - enrollment successful")
+
+    def drop(self, CRN):
+        sql = str("DELETE FROM Enrollment WHERE CRN = " + str(CRN) + " AND student_id = " + str(self.ID))
+        run_sql(sql)
+
+    def print_my_courses(self):
+        sql = str("SELECT Enrollment.CRN, Courses.title, Courses.startTime, Courses.endTime, Courses.days, Courses.instructor "
+                  + "from Enrollment INNER JOIN Courses ON Enrollment.CRN = Courses.CRN "
+                  + "WHERE Enrollment.Student_ID = " + self.ID)
+        return run_sql(sql)
+
+
 
 
 class Admin(User):
@@ -306,3 +315,8 @@ class Sysadmin(Admin, Instructor, Student):
         self.major = None
         self.office = None
         self.accountType = "Sysadmin"
+
+s2j = Student("Johnny", "Kim", 23)
+s2j.enroll(2)
+s2j.enroll(3)
+s2j.enroll(4)
