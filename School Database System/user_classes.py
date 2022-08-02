@@ -114,7 +114,7 @@ class Student(User):
         sql = str("SELECT Enrollment.CRN, Courses.title, Courses.startTime, Courses.endTime, Courses.days, Courses.instructor "
                   + "from Enrollment INNER JOIN Courses ON Enrollment.CRN = Courses.CRN "
                   + "WHERE Enrollment.Student_ID = " + str(self.ID))
-        enrollments = run_sql(sql)
+        enrollments = run_sql(sql, suppress=True)
         conflicts = []
 
         def check_days(course_info):
@@ -178,7 +178,7 @@ class Student(User):
             sql = str("DELETE FROM Enrollment WHERE enrollment_ID = " + str(enrollment_id))
             run_sql(sql)
         else:
-            print("No conflict detected - enrollment successful")
+            print("Enrollment successful")
 
     def drop(self, CRN):
         sql = str("DELETE FROM Enrollment WHERE CRN = " + str(CRN) + " AND student_id = " + str(self.ID))
@@ -315,8 +315,3 @@ class Sysadmin(Admin, Instructor, Student):
         self.major = None
         self.office = None
         self.accountType = "Sysadmin"
-
-s2j = Student("Johnny", "Kim", 23)
-s2j.enroll(2)
-s2j.enroll(3)
-s2j.enroll(4)
