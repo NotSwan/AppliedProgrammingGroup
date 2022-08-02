@@ -225,6 +225,30 @@ class Admin(User):
             return
         return sql_output.extend(self.remove_entry(table, ID))
 
+    def enroll_for_student(self, student_ID, course_ID):
+        sql = str("SELECT firstName, lastName FROM Students WHERE ID = " + str(student_ID))
+        result = run_sql(sql)[0]
+        Student(result[0], result[1], student_ID).enroll(course_ID)
+
+    def drop_for_student(self, student_ID, course_ID):
+        sql = str("SELECT firstName, lastName FROM Students WHERE ID = " + str(student_ID))
+        result = run_sql(sql)[0]
+        Student(result[0], result[1], student_ID).drop(course_ID)
+
+    def assign_for_instructor(self, instructor_ID, course_ID):
+        sql = str("SELECT firstName, lastName FROM Instructors WHERE ID = " + str(instructor_ID))
+        result = run_sql(sql)[0]
+        Instructor(result[0], result[1], instructor_ID).assign_course_instructor(course_ID)
+
+    def assign_for_instructor(self, instructor_ID, course_ID):
+        sql = str("SELECT firstName, lastName FROM Instructors WHERE ID = " + str(instructor_ID))
+        result = run_sql(sql)[0]
+        Instructor(result[0], result[1], instructor_ID).assign_course_instructor(course_ID)
+
+    def remove_for_instructor(self, instructor_ID, course_ID):
+        sql = str("SELECT firstName, lastName FROM Instructors WHERE ID = " + str(instructor_ID))
+        result = run_sql(sql)[0]
+        Instructor(result[0], result[1], instructor_ID).remove_course_instructor(course_ID)
 
 class Sysadmin(Admin, Instructor, Student):
     # useful class for quickly making an object to test your methods
