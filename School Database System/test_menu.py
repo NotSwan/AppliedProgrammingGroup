@@ -40,6 +40,10 @@ class Tester(unittest.TestCase):
         self.assertIsInstance(menu.login("eddyb","password","password"), user_classes.Instructor)
     
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    def test_add_course(self):
+        self.admin.create_new_course("Fake Course", "3", "MWF", "2022", "0", "FAKE")
+
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def assert_stdout_print_roster(self, expected_output ,mock_stdout):
         self.instructor.print_course_roaster()
         self.assertEqual(mock_stdout.getvalue(), expected_output)
