@@ -25,6 +25,7 @@ ___
 ## Component Analysis
 Decide the level of customizability the customer wants: If they want to use a full solution (MySchool, Kiddom, PCR Educator Management System, etc.) or would like to have a custom solution where a database management system as well as custom interfacing UI would have to be created.
 []: # (Spelling - EH)
+[]: # (what could help make this decision - NN)
 
 ## Requirement Modification
 + A base class of user containing ID and name
