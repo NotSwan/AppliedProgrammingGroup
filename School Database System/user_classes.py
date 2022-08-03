@@ -110,6 +110,57 @@ class Student(User):
     def set_major(self, major):
         self.major = major
 
+    def check_schedule_conflicts(self):
+        sql = str("SELECT Enrollment.CRN, Courses.title, Courses.startTime, Courses.endTime, Courses.days, Courses.instructor "
+                  + "from Enrollment INNER JOIN Courses ON Enrollment.CRN = Courses.CRN "
+                  + "WHERE Enrollment.Student_ID = " + str(self.ID))
+        enrollments = run_sql(sql, suppress=True)
+        conflicts = []
+
+        def check_days(course_info):
+            days = [False, False, False, False, False]  # 5 days because no courses on Saturday or Sunday
+            if "M" in course_info[4]:
+                days[0] = True
+            if "T" in course_info[4]:
+                days[1] = True
+            if "W" in course_info[4]:
+                days[2] = True
+            if "R" in course_info[4]:
+                days[3] = True
+            if "F" in course_info[4]:
+                days[4] = True
+            return days
+
+        for enroll_num in range(0, len(enrollments) - 1): # for every course in the enrollments list
+            course1_info = enrollments[enroll_num]
+            days1 = check_days(course1_info)
+
+            for enroll_num2 in range(enroll_num + 1, len(enrollments)):
+                course2_info = enrollments[enroll_num2]
+                days2 = check_days(course2_info)
+
+                for weekday in range(0, 5):
+                    if days1[weekday] and days2[weekday]:
+                        start1 = course1_info[2]
+                        end1 = course1_info[3]
+                        start2 = course2_info[2]
+                        end2 = course2_info[3]
+
+                        if (start2 <= start1 <= end2) or (start2 <= end1 <= end2):
+                            conflicts.append([course1_info, course2_info])
+                            break
+
+        if not conflicts: # if conflicts array is empty
+            print("No course conflicts found")
+            return 0
+        else:
+            for conflict in conflicts:
+                print("The these 2 classes conflict:")
+                print(conflict[0])
+                print(conflict[1])
+                print()
+                return 1
+
     def enroll(self, CRN):
         check_next_id = run_sql("SELECT enrollment_ID FROM Enrollment ORDER BY enrollment_ID DESC", suppress=True)
 
@@ -122,15 +173,24 @@ class Student(User):
                   + str(enrollment_id) + ", " + str(CRN) + ", " + str(self.ID) + ", '" + self.fullName + "')")
         run_sql(sql)
 
+        if self.check_schedule_conflicts():
+            print("Enrollment canceled")
+            sql = str("DELETE FROM Enrollment WHERE enrollment_ID = " + str(enrollment_id))
+            run_sql(sql)
+        else:
+            print("Enrollment successful")
+
     def drop(self, CRN):
         sql = str("DELETE FROM Enrollment WHERE CRN = " + str(CRN) + " AND student_id = " + str(self.ID))
         run_sql(sql)
 
     def print_my_courses(self):
-        sql = str("SELECT Enrollment.CRN, Courses.title, Courses.time, Courses.days, Courses.instructor "
+        sql = str("SELECT Enrollment.CRN, Courses.title, Courses.startTime, Courses.endTime, Courses.days, Courses.instructor "
                   + "from Enrollment INNER JOIN Courses ON Enrollment.CRN = Courses.CRN "
                   + "WHERE Enrollment.Student_ID = " + self.ID)
         return run_sql(sql)
+
+
 
 
 class Admin(User):
@@ -188,11 +248,11 @@ class Admin(User):
                 self.update_field("Students", ID, "gradYear", gradYear)
 
 
-    def create_new_course(self, title, time, days, year, credits, dept):
+    def create_new_course(self, title, startTime, endTime, days, year, credits, dept):
         CRN = str(run_sql("SELECT CRN FROM Courses ORDER BY CRN DESC", suppress=True)[0][0] + 1)
 
         sql = str("INSERT INTO Courses (CRN, title, time, days, year, credits, dept) VALUES (" +
-                  str(CRN) + ", '" + title + "', " + str(time) + ", '" + days + "', " + str(year)
+                  str(CRN) + ", '" + title + "', " + str(startTime) + ", '" + str(endTime) + "," + days + "', " + str(year)
                   + ", " + str(credits) + ", '" + dept + "')")
         return run_sql(sql)
 
@@ -225,6 +285,25 @@ class Admin(User):
             return
         return sql_output.extend(self.remove_entry(table, ID))
 
+    def enroll_for_student(self, student_ID, course_ID):
+        sql = str("SELECT firstName, lastName FROM Students WHERE ID = " + str(student_ID))
+        result = run_sql(sql)[0]
+        return Student(result[0], result[1], student_ID).enroll(course_ID)
+
+    def drop_for_student(self, student_ID, course_ID):
+        sql = str("SELECT firstName, lastName FROM Students WHERE ID = " + str(student_ID))
+        result = run_sql(sql)[0]
+        Student(result[0], result[1], student_ID).drop(course_ID)
+
+    def assign_for_instructor(self, instructor_ID, course_ID):
+        sql = str("SELECT firstName, lastName FROM Instructors WHERE ID = " + str(instructor_ID))
+        result = run_sql(sql)[0]
+        Instructor(result[0], result[1], instructor_ID).assign_course_instructor(course_ID)
+
+    def remove_for_instructor(self, instructor_ID, course_ID):
+        sql = str("SELECT firstName, lastName FROM Instructors WHERE ID = " + str(instructor_ID))
+        result = run_sql(sql)[0]
+        Instructor(result[0], result[1], instructor_ID).remove_course_instructor(course_ID)
 
 class Sysadmin(Admin, Instructor, Student):
     # useful class for quickly making an object to test your methods
