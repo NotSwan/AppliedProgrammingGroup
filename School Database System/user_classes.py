@@ -17,19 +17,19 @@ def run_sql(sql, suppress=False):
     # and every method that calls run_sql returns that same output
     # will be much more practical for testing
 
-    print("SQLite << " + sql)
 
     try:
         result = db.execute(sql).fetchall()
+        total = ""
         if result and not suppress:  # if list is not empty
             for row in result:
                 data = str(row)
                 data = data.replace("(", "")
                 data = data.replace(")", "")
                 data = data.replace("'", "")
-                print(data)
+                total += (data + "\n")
 
-        return result
+        return total
 
     except Exception as e:
         print("SQLite error:")
@@ -152,9 +152,9 @@ class Admin(User):
 
     def create_new_user(self, firstName, lastName, new_accountType,
                         office=None, dept=None, hireYear=None, major=None, gradYear=None):
-        username = (str(lastName + firstName[0]))
+        username = (str(lastName + firstName))
 
-        ID = str(run_sql("SELECT ID FROM Logins ORDER BY ID DESC", suppress=True)[0][0] + 1)
+        ID = str(run_sql("SELECT ID FROM Logins ORDER BY ID DESC", suppress=True))
         sql = str("INSERT INTO Logins (ID, accountType, username) VALUES ("
                   + ID + ", '" + new_accountType + "', '" + username.lower() + "')")
         run_sql(sql)
