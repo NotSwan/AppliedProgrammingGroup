@@ -2,7 +2,7 @@ import sqlite3 as sql
 
 try:
     # works for Erik's IDE
-    db = sql.connect("data2.db")
+    db = sql.connect("School Database System/data2.db")
 except:
     try:
         # works for Tyler's IDE
@@ -28,7 +28,8 @@ def run_sql(sql, suppress=False):
                 data = data.replace(")", "")
                 data = data.replace("'", "")
                 total += (data + "\n")
-
+        else:
+            total = result
         return total
 
     except Exception as e:
@@ -213,10 +214,11 @@ class Admin(User):
     def create_new_user(self, firstName, lastName, new_accountType,
                         office=None, dept=None, hireYear=None, major=None, gradYear=None):
         username = (str(lastName + firstName))
-
+        print(username)
         ID = str(run_sql("SELECT ID FROM Logins ORDER BY ID DESC", suppress=True))
         sql = str("INSERT INTO Logins (ID, accountType, username) VALUES ("
                   + ID + ", '" + new_accountType + "', '" + username.lower() + "')")
+        print(sql)
         run_sql(sql)
 
         # new users do not get assigned a password
@@ -249,11 +251,12 @@ class Admin(User):
 
 
     def create_new_course(self, title, startTime, endTime, days, year, credits, dept):
-        CRN = str(run_sql("SELECT CRN FROM Courses ORDER BY CRN DESC", suppress=True)[0][0] + 1)
-
-        sql = str("INSERT INTO Courses (CRN, title, time, days, year, credits, dept) VALUES (" +
-                  str(CRN) + ", '" + title + "', " + str(startTime) + ", '" + str(endTime) + "," + days + "', " + str(year)
-                  + ", " + str(credits) + ", '" + dept + "')")
+        CRN = str(run_sql("SELECT CRN FROM Courses ORDER BY CRN DESC",suppress=True)[0][0]+1)
+        print(CRN)
+        sql = str("INSERT INTO Courses (CRN, title, startTime, endTime, days, year, credits, dept, instructor) VALUES (" +
+                  str(CRN) + ", '" + title + "', " + str(startTime) + ", " + str(endTime) + ", '" + days + "', " + str(year)
+                  + ", " + str(credits) + ", '" + dept+ "', '"+ "NULL" +"')")
+        print(sql)
         return run_sql(sql)
 
     def remove_entry(self, table, pri_key):
