@@ -1,8 +1,29 @@
+from dataclasses import field
+from re import T
+import string
 from tkinter import *
 from tkinter import ttk
+from turtle import st
 from user_classes import *
 import menu
- 
+#######################################################################
+# Check List
+# All
+#   Login - Done
+#   Search for courses - Done
+# Student
+#   Add/Remove Course From Schedule - Done
+#   Check Conflicts - Done
+#   Print Indiviual Schedule - Done
+# Instructor
+#   Print Course teaching schedule - Done
+#   Print/Search course roster(s) - Done
+# Admin
+#   Add Courses - Done
+#   Remove Courses - Done
+#   Add Instructors/Students - Done
+#   Link/Unlink instr/students from course - Done
+######################################################################
 def main():
     global master
     global menuFrame
@@ -54,7 +75,11 @@ def try_login():
     global user
     right_password = (db.execute("SELECT password FROM Logins WHERE username = '" + (username.get()) + "'")).fetchone()
     user = menu.login(username.get(), password.get(), right_password[0])
-    if user != None:
+    if (db.execute("SELECT ID FROM Logins WHERE username = '" + username.get() + "'")).fetchone() is None:
+        main_menu()
+    else:
+        db.execute("UPDATE Logins SET password = '" + password.get() + "' WHERE username ='" + username.get() + "'")
+        user = menu.login(username.get(), password.get(), password.get())
         main_menu()
 
 def main_menu():
@@ -73,37 +98,155 @@ def main_menu():
 
     message0 = ttk.Button(mainMenuFrame, text="Logout", command=logout)
     message1 = ttk.Button(mainMenuFrame, text="List all courses", command=list_all)
-    message2 = ttk.Button(mainMenuFrame, text="Search classes")
-    message0.grid(column= 1, row=0, padx=10, pady=5)
+    message2 = ttk.Button(mainMenuFrame, text="Search classes",command=search_with_params)
+    message0.grid(column= 2, row=0, padx=10, pady=5)
     message1.grid(column= 0, row=1, padx=10, pady=5, sticky=W)
     message2.grid(column= 0, row=2, padx=10, pady=5, sticky=W)
 
     if(isinstance(user, Admin)):
         message3 = ttk.Button(mainMenuFrame, text="Add Course", command= new_course)
-        message4 = ttk.Button(mainMenuFrame, text="Remove Course(s)")
+        message4 = ttk.Button(mainMenuFrame, text="Remove Course(s)", command=delete_course)
         message5 = ttk.Button(mainMenuFrame, text="Add User", command=new_user)
-        message6 = ttk.Button(mainMenuFrame, text="Link/Unlink Courses")
+        message6 = ttk.Button(mainMenuFrame, text="Link/Unlink Courses", command=link_unlink)
         message3.grid(column=0, row=3, padx=10, pady=5, sticky=W)
         message4.grid(column=0, row=4, padx=10, pady=5, sticky=W)
         message5.grid(column=0, row=5, padx=10, pady=5, sticky=W)
         message6.grid(column=0, row=6, padx=10, pady=5, sticky=W)
 
     if(isinstance(user, Student)):
-        message3 = ttk.Button(mainMenuFrame, text="Add Course")
-        message4 = ttk.Button(mainMenuFrame, text="Remove Course(s)")
-        message5 = ttk.Button(mainMenuFrame, text="Print Roster")
-        message3.grid(column=0, row=3, padx=10, pady=5, sticky=W)
-        message4.grid(column=0, row=4, padx=10, pady=5, sticky=W)
-        message5.grid(column=0, row=5, padx=10, pady=5, sticky=W)
+        message3 = ttk.Button(mainMenuFrame, text="Add/Remove Course", command=student_link)
+        message5 = ttk.Button(mainMenuFrame, text="Print Schedule", command=print_schedule)
+        message3.grid(column=0, row=5, padx=10, pady=5, sticky=W)
+        message5.grid(column=0, row=3, padx=10, pady=5, sticky=W)
     
     if(isinstance(user, Instructor)):
-        message3 = ttk.Button(mainMenuFrame, text="Print Schedule")
-        message4 = ttk.Button(mainMenuFrame, text="Search Courses")
+        message3 = ttk.Button(mainMenuFrame, text="Print Schedule", command=print_schedule)
+        message4 = ttk.Button(mainMenuFrame, text="Search Courses", command=search_rosters)
         message3.grid(column=0, row=3, padx=10, pady=5, sticky=W)
         message4.grid(column=0, row=4, padx=10, pady=5, sticky=W)
 
-    button69 = ttk.Button(mainMenuFrame, text="Commit", commit=db.commit)
-    button69.grid(column=3,row=1,padx=10,pady=5)
+    buttonCmt = ttk.Button(mainMenuFrame, text="Commit", command=db.commit)
+    buttonCmt.grid(column=1,row=0,padx=10,pady=5)
+
+def print_schedule():
+    try:
+        output.destroy()
+    except:
+        pass
+    if(isinstance(user, Student)):
+        output = ttk.Label(mainMenuFrame, text=user.print_my_courses(), style='ST.TLabel')
+        output.grid(column=1,row=1, rowspan=5)
+    if(isinstance(user, Instructor)):
+        output = ttk.Label(mainMenuFrame, text=user.print_course_roaster(), style='ST.TLabel')
+        output.grid(column=1,row=1, rowspan=5)
+
+def search_rosters():
+        
+    def roster_callback():
+        temp = user.print_roster(classNum.get())
+        out = ttk.Label(frameSR, style='ST.TLabel', text=temp)
+        out.grid(column=1,row=1, padx=10, pady=5)
+        
+    mainMenuFrame.grid_remove()
+    frameSR = LabelFrame(master, text="Search Roster", foreground="#8052a1", background="#71b3c7")
+    frameSR.grid(column=0,row=0,sticky=(N,E,W,S))
+    
+    classNum = StringVar(frameSR, "")
+    
+    lbl = ttk.Label(frameSR, text="CRN: ", style='ST.TLabel')
+    lbl.grid(column=0,row=0,padx=10,pady=5)
+    
+    ent1 = ttk.Entry(frameSR, textvariable=classNum)
+    ent1.grid(column=1,row=0,padx=10,pady=5)
+    
+    button0 = ttk.Button(frameSR, text="Search", command=roster_callback)
+    button0.grid(column=2, row=1, padx=10, pady=5)
+    btn = ttk.Button(frameSR, text="Return", command=main_menu)
+    btn.grid(column=0, row=2, padx=10,pady=5)
+        
+def link_unlink():
+    mainMenuFrame.grid_remove()
+    linkFrame = LabelFrame(master, text="Link/Unlink", foreground="#8052a1", background="#71b3c7")
+    linkFrame.grid(column=0,row=0,sticky=(N,E,W,S))
+    button0 = ttk.Button(linkFrame, text="Student Menu", command=student_link)
+    button1 = ttk.Button(linkFrame, text="Instructor Menu", command=instructor_link)
+    button2 = ttk.Button(linkFrame, text="Menu", command=main_menu)
+    button0.grid(column=0, row=0, padx=10, pady=5)
+    button1.grid(column=2, row=0, padx=10,pady=5)
+    button2.grid(column=1, row=1, padx=10,pady=5)
+
+def student_link():
+    
+    def add_std_callback():
+        if(isinstance(user, Admin)):
+            temp = user.enroll_for_student(ID.get(), classID.get())
+        elif(isinstance(user, Student)):
+            temp = user.enroll(classID.get())
+        lbl = ttk.Label(link, text=temp, style='ST.TLabel')
+        lbl.grid(column=0,row=3,padx=10,pady=5)
+        
+    def rmv_std_callback():
+        if(isinstance(user, Admin)):
+            temp = user.drop_for_student(ID.get(),classID.get()) 
+        elif(isinstance(user, Student)):
+            temp = user.drop(classID.get())
+        lbl = ttk.Label(link, text=temp, style='ST.TLabel')
+        lbl.grid(column=0,row=3,padx=10,pady=5)
+    
+    link = LabelFrame(master, text="Student Link/Unlink", foreground="#8052a1", background="#71b3c7")
+    link.grid(column=0,row=0,sticky=(N,E,W,S))
+    
+    if(isinstance(user, Admin)):
+        lbl = ttk.Label(link, text="Student ID: ", style='ST.TLabel')
+        lbl.grid(column=0,row=0,padx=10,pady=5)
+        ent1 = ttk.Entry(link, textvariable=ID)
+        ent1.grid(column=1,row=0,padx=10,pady=5)
+    lbl = ttk.Label(link, text="CRN: ", style='ST.TLabel')
+    lbl.grid(column=0,row=1,padx=10,pady=5)
+    
+    ID = StringVar(link,"")
+    classID = StringVar(link, "")
+    
+    ent2 = ttk.Entry(link, textvariable=classID)
+    ent2.grid(column=1,row=1,padx=10,pady=5)
+    
+    add = ttk.Button(link, text="Add",command=add_std_callback)
+    add.grid(column=2,row=0,padx=10,pady=5, sticky=E)
+    rmv = ttk.Button(link, text="Remove",command=rmv_std_callback)
+    rmv.grid(column=2,row=1,padx=10,pady=5, sticky=E)
+    
+    btn = ttk.Button(link, text="Return", command=link_unlink)
+    btn.grid(column=2, row=2, padx=10,pady=5)
+     
+def instructor_link():
+    
+    def add_inst_callback():
+        user.assign_for_instructor(ID.get(), classID.get())
+    def rmv_inst_callback():
+        user.remove_for_instructor(ID.get(), classID.get())
+        
+    link = LabelFrame(master, text="Instructor Link/Unlink", foreground="#8052a1", background="#71b3c7")
+    link.grid(column=0,row=0,sticky=(N,E,W,S))
+    
+    lbl = ttk.Label(link, text="Instructor ID: ", style='ST.TLabel')
+    lbl.grid(column=0,row=0,padx=10,pady=5)
+    lbl = ttk.Label(link, text="CRN: ", style='ST.TLabel')
+    lbl.grid(column=0,row=1,padx=10,pady=5)
+    
+    ID = StringVar(link,"")
+    classID = StringVar(link, "")
+    ent1 = ttk.Entry(link, textvariable=ID)
+    ent1.grid(column=1,row=0,padx=10,pady=5)
+    ent2 = ttk.Entry(link, textvariable=classID)
+    ent2.grid(column=1,row=1,padx=10,pady=5)
+    
+    add = ttk.Button(link, text="Add",command=add_inst_callback)
+    add.grid(column=2,row=0,padx=10,pady=5, sticky=E)
+    rmv = ttk.Button(link, text="Remove",command=rmv_inst_callback)
+    rmv.grid(column=2,row=1,padx=10,pady=5, sticky=E)
+    
+    btn = ttk.Button(link, text="Return", command=link_unlink)
+    btn.grid(column=2, row=2, padx=10,pady=5)
 
 def logout():
     mainMenuFrame.grid_remove()
@@ -115,23 +258,84 @@ def list_all():
         output.destroy()
     except:
         pass
-    print(user.print_all_courses())
     output = ttk.Label(mainMenuFrame, text=user.print_all_courses(), style='ST.TLabel')
     output.grid(column=1,row=1, rowspan=5)
 
-def new_user():
-    global q0,q1,q2,q3,q4,q5,q6
+def search_with_params():
+    
+    def search_with_params_callback_1():
+        temp = user.search_courses("CRN", search.get())
+        label0 = ttk.Label(searchFrame, style='ST.TLabel', text=temp)
+        label0.grid(column=1, row=1, padx=10,pady=5, rowspan=3)
+    def search_with_params_callback_2():  
+        temp = user.search_courses("title", search.get())
+        label0 = ttk.Label(searchFrame, style='ST.TLabel', text=temp)
+        label0.grid(column=1, row=1, padx=10,pady=5, rowspan=3)
+    def search_with_params_callback_3():  
+        temp = user.search_courses("days", search.get())
+        label0 = ttk.Label(searchFrame, style='ST.TLabel', text=temp)
+        label0.grid(column=1, row=1, padx=10,pady=5, rowspan=3)
+    def search_with_params_callback_4():     
+        temp = user.search_courses("year", search.get())
+        label0 = ttk.Label(searchFrame, style='ST.TLabel', text=temp)
+        label0.grid(column=1, row=1, padx=10,pady=5, rowspan=3)
+    def search_with_params_callback_5():       
+        temp = user.search_courses("credits", search.get())
+        label0 = ttk.Label(searchFrame, style='ST.TLabel', text=temp)
+        label0.grid(column=1, row=1, padx=10,pady=5, rowspan=3)
+    def search_with_params_callback_6():  
+        temp = user.search_courses("dept", search.get())
+        label0 = ttk.Label(searchFrame, style='ST.TLabel', text=temp)
+        label0.grid(column=1, row=1, padx=10,pady=5, rowspan=3)
+    def search_with_params_callback_7():
+
+        temp = user.search_courses("instructor", search.get())
+        label0 = ttk.Label(searchFrame, style='ST.TLabel', text=temp)
+        label0.grid(column=1, row=1, padx=10,pady=5, rowspan=3)
+
     mainMenuFrame.grid_remove()
+    searchFrame = LabelFrame(master, text="Search With Paramaters", foreground="#8052a1", background="#71b3c7")
+    searchFrame.grid(column=0, row=0, sticky=(N,E,W,S))
+    search = StringVar(searchFrame, "")
+    button0 = ttk.Button(searchFrame, text="CRN", command=search_with_params_callback_1)
+    button1 = ttk.Button(searchFrame, text="Title", command=search_with_params_callback_2)
+    button2 = ttk.Button(searchFrame, text="Days", command=search_with_params_callback_3)
+    button3 = ttk.Button(searchFrame, text="Year", command=search_with_params_callback_4)
+    button4 = ttk.Button(searchFrame, text="Credits", command=search_with_params_callback_5)
+    button5 = ttk.Button(searchFrame, text="Dept", command=search_with_params_callback_6)
+    button6 = ttk.Button(searchFrame, text="Instructor", command=search_with_params_callback_7)
+    entry0 = ttk.Entry(searchFrame, textvariable=search)
+    
+    label0 = ttk.Label(searchFrame, style='ST.TLabel', text="")
+    
+    button0.grid(column=0,row=0,padx=10,pady=5)
+    button1.grid(column=0,row=1,padx=10,pady=5)
+    button2.grid(column=0,row=2,padx=10,pady=5)
+    button3.grid(column=0,row=3,padx=10,pady=5)
+    button4.grid(column=0,row=4,padx=10,pady=5)
+    button5.grid(column=0,row=5,padx=10,pady=5)
+    button6.grid(column=0,row=6,padx=10,pady=5)
+    entry0.grid(column=1,row=0,padx=10,pady=5)
+    label0.grid(column=1, row=1, padx=10,pady=5, rowspan=3)
+    button10 = ttk.Button(searchFrame, text="Return", command=main_menu)
+    button10.grid(column=0, row=8, padx=10, pady=5)
+
+def new_user():
+    mainMenuFrame.grid_remove()
+    
+    def create_user_callback():
+        user.create_new_user(cleanInput(q0.get()), cleanInput(q1.get()), cleanInput(q2.get()))
+    
     newCourseFrame = LabelFrame(master, text="Add a New Course", foreground="#8052a1", background="#71b3c7")
     newCourseFrame.grid(column=0, row=0, sticky=(N,E,W,S)) 
     question0 = ttk.Label(newCourseFrame, style='ST.TLabel', text="First Name")
     question1 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Last Name")
     question2 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Account Type")
-    question3 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Office(Optional)")
-    question4 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Dept(Optional)")
-    question5 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Major(Optional)")
-    question6 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Hire Year(Optional)")
-    question7 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Grad Year(Optional)")
+    question3 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Office(Admin)")
+    question4 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Dept(Instructors)")
+    question5 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Major(Students)")
+    question6 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Hire Year(Instructors)")
+    question7 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Grad Year(Students)")
     question0.grid(column=0,row=0,padx=10,pady=5, sticky=W)
     question1.grid(column=0,row=1,padx=10,pady=5, sticky=W)
     question2.grid(column=0,row=2,padx=10,pady=5, sticky=W)
@@ -173,10 +377,12 @@ def new_user():
     button1.grid(column=0, row=8, padx=10, pady=5)
     button2.grid(column=1, row=8, padx=10, pady=5)
 
-
 def new_course():
-    global q0,q1,q2,q3,q4,q5,q6
     mainMenuFrame.grid_remove()
+    
+    def create_course_callback():
+        user.create_new_course(cleanInput(q0.get()), cleanInput(q1.get()), cleanInput(q2.get()), cleanInput(q3.get()), cleanInput(q4.get()), cleanInput(q5.get()), cleanInput(q6.get()))
+
     newCourseFrame = LabelFrame(master, text="Add a New Course", foreground="#8052a1", background="#71b3c7")
     newCourseFrame.grid(column=0, row=0, sticky=(N,E,W,S)) 
     question0 = ttk.Label(newCourseFrame, style='ST.TLabel', text="Title")
@@ -227,33 +433,17 @@ def new_course():
     button1.grid(column=0, row=8, padx=10, pady=5)
     button2.grid(column=1, row=8, padx=10, pady=5)
 
-def create_user_callback():
-    user.create_new_user(cleanInput(q0.get()), cleanInput(q1.get()), cleanInput(q2.get()))
-
-
-def create_course_callback():
-    user.create_new_course(cleanInput(q0.get()), cleanInput(q1.get()), cleanInput(q2.get()), cleanInput(q3.get()), cleanInput(q4.get()), cleanInput(q5.get()), cleanInput(q6.get()))
-
 def cleanInput(input):
     if (input == ""):
         return None
     else:
         return input
-def delete_user():
-    mainMenuFrame.grid_remove()
-    newCourseFrame = LabelFrame(master, text="Delete User", foreground="#8052a1", background="#71b3c7")
-    newCourseFrame.grid(column=0, row=0, sticky=(N,E,W,S)) 
-    label = ttk.Label(newCourseFrame, style='ST.TLabel', text="ID")
-    label.grid(column=0,row=0,padx=10,pady=5, sticky=W)
-    question0 = ttk.Entry(newCourseFrame, textvariable=q0)
-    question0.grid(column=1,row=0,padx=10,pady=5, sticky=W)
-    button1 = ttk.Button(newCourseFrame, text="Return", command=main_menu)
-    button2 = ttk.Button(newCourseFrame, text="Delete", command=user.remove_entry("asdf", q0.get()))
-    button1.grid(column=0, row=8, padx=10, pady=5)
-    button2.grid(column=1, row=8, padx=10, pady=5)
 
 def delete_course():
-    global crn
+    
+    def delete_course_callback():
+        user.remove_entry('Courses', int(crn.get()))
+        
     mainMenuFrame.grid_remove()
     newCourseFrame = LabelFrame(master, text="Delete Course", foreground="#8052a1", background="#71b3c7")
     newCourseFrame.grid(column=0, row=0, sticky=(N,E,W,S)) 
@@ -267,8 +457,5 @@ def delete_course():
     button1.grid(column=0, row=8, padx=10, pady=5)
     button2.grid(column=1, row=8, padx=10, pady=5)
 
-
-def delete_course_callback():
-    user.remove_entry('Courses', int(crn.get()))
 if __name__ == '__main__':
     main()
