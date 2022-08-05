@@ -1,14 +1,9 @@
 import sqlite3 as sql
 
-try:
-    # works for Erik's IDE
-    db = sql.connect("data2.db")
-except:
-    try:
-        # works for Tyler's IDE
-        db = sql.connect("School Database System/data2.db")
-    except:
-        print("database could not be located - check local directory")
+
+db = sql.connect("data2.db")
+#db = sql.connect("School Database System/data2.db")
+
 
 
 def run_sql(sql, suppress=False):
@@ -17,19 +12,20 @@ def run_sql(sql, suppress=False):
     # and every method that calls run_sql returns that same output
     # will be much more practical for testing
 
-    print("SQLite << " + sql)
 
     try:
         result = db.execute(sql).fetchall()
+        total = ""
         if result and not suppress:  # if list is not empty
             for row in result:
                 data = str(row)
                 data = data.replace("(", "")
                 data = data.replace(")", "")
                 data = data.replace("'", "")
-                print(data)
-
-        return result
+                total += (data + "\n")
+        else:
+            total = result
+        return total
 
     except Exception as e:
         print("SQLite error:")
@@ -80,7 +76,7 @@ class Instructor(User):
         self.hireYear = hireYear
 
     def assign_course_instructor(self, CRN):
-        sql = str("UPDATE Courses SET instructor = '" + self.lastName + "' WHERE CRN = " + str(CRN))
+        sql = str("UPDATE Courses SET instructor = '" + (self.lastName) + "' WHERE CRN = " + str(CRN))
         run_sql(sql)
 
     def remove_course_instructor(self, CRN):
@@ -93,6 +89,10 @@ class Instructor(User):
             sql = str("UPDATE Courses SET instructor = NULL WHERE CRN = " + str(CRN))
             run_sql(sql)
 
+    def print_roster(self, CRN):
+        sql = str("SELECT student_name FROM Enrollment WHERE CRN = '" + str(CRN) + "'")
+        return run_sql(sql)
+    
     def print_course_roaster(self):
         sql = str("SELECT * FROM Courses WHERE instructor = '" + self.lastName + "'")
         return run_sql(sql)
@@ -151,14 +151,11 @@ class Student(User):
                             break
 
         if not conflicts: # if conflicts array is empty
-            print("No course conflicts found")
+            #print("No course conflicts found")
             return 0
         else:
             for conflict in conflicts:
-                print("The these 2 classes conflict:")
-                print(conflict[0])
-                print(conflict[1])
-                print()
+                # print("The these 2 classes conflict:" + conflict[0] + conflict[1])
                 return 1
 
     def enroll(self, CRN):
@@ -168,17 +165,15 @@ class Student(User):
             enrollment_id = 1
         else:
             enrollment_id = str((check_next_id[0][0] + 1))
-
+        
         sql = str("INSERT INTO Enrollment (enrollment_ID, CRN, student_ID, student_name) VALUES ("
                   + str(enrollment_id) + ", " + str(CRN) + ", " + str(self.ID) + ", '" + self.fullName + "')")
         run_sql(sql)
 
         if self.check_schedule_conflicts():
-            print("Enrollment canceled")
             sql = str("DELETE FROM Enrollment WHERE enrollment_ID = " + str(enrollment_id))
             run_sql(sql)
-        else:
-            print("Enrollment successful")
+            return("Conflict found")
 
     def drop(self, CRN):
         sql = str("DELETE FROM Enrollment WHERE CRN = " + str(CRN) + " AND student_id = " + str(self.ID))
@@ -189,10 +184,6 @@ class Student(User):
                   + "from Enrollment INNER JOIN Courses ON Enrollment.CRN = Courses.CRN "
                   + "WHERE Enrollment.Student_ID = " + self.ID)
         return run_sql(sql)
-
-
-
-
 class Admin(User):
     def __init__(self, firstName, lastName, id):
         User.__init__(self, firstName, lastName, id)
@@ -212,11 +203,12 @@ class Admin(User):
 
     def create_new_user(self, firstName, lastName, new_accountType,
                         office=None, dept=None, hireYear=None, major=None, gradYear=None):
-        username = (str(lastName + firstName[0]))
-
+        username = (str(lastName + firstName[0])).lower() 
+        print(username)
         ID = str(run_sql("SELECT ID FROM Logins ORDER BY ID DESC", suppress=True)[0][0] + 1)
         sql = str("INSERT INTO Logins (ID, accountType, username) VALUES ("
                   + ID + ", '" + new_accountType + "', '" + username.lower() + "')")
+        print(sql)
         run_sql(sql)
 
         # new users do not get assigned a password
@@ -247,13 +239,13 @@ class Admin(User):
             if gradYear is not None:
                 self.update_field("Students", ID, "gradYear", gradYear)
 
-
     def create_new_course(self, title, startTime, endTime, days, year, credits, dept):
-        CRN = str(run_sql("SELECT CRN FROM Courses ORDER BY CRN DESC", suppress=True)[0][0] + 1)
-
-        sql = str("INSERT INTO Courses (CRN, title, time, days, year, credits, dept) VALUES (" +
-                  str(CRN) + ", '" + title + "', " + str(startTime) + ", '" + str(endTime) + "," + days + "', " + str(year)
-                  + ", " + str(credits) + ", '" + dept + "')")
+        CRN = str(run_sql("SELECT CRN FROM Courses ORDER BY CRN DESC",suppress=True)[0][0]+1)
+        print(CRN)
+        sql = str("INSERT INTO Courses (CRN, title, startTime, endTime, days, year, credits, dept, instructor) VALUES (" +
+                  str(CRN) + ", '" + title + "', " + str(startTime) + ", " + str(endTime) + ", '" + days + "', " + str(year)
+                  + ", " + str(credits) + ", '" + dept+ "', '"+ "NULL" +"')")
+        print(sql)
         return run_sql(sql)
 
     def remove_entry(self, table, pri_key):
@@ -287,17 +279,17 @@ class Admin(User):
 
     def enroll_for_student(self, student_ID, course_ID):
         sql = str("SELECT firstName, lastName FROM Students WHERE ID = " + str(student_ID))
-        result = run_sql(sql)[0]
+        result = run_sql(sql)
         return Student(result[0], result[1], student_ID).enroll(course_ID)
 
     def drop_for_student(self, student_ID, course_ID):
         sql = str("SELECT firstName, lastName FROM Students WHERE ID = " + str(student_ID))
-        result = run_sql(sql)[0]
+        result = run_sql(sql).split(", ")
         Student(result[0], result[1], student_ID).drop(course_ID)
 
     def assign_for_instructor(self, instructor_ID, course_ID):
         sql = str("SELECT firstName, lastName FROM Instructors WHERE ID = " + str(instructor_ID))
-        result = run_sql(sql)[0]
+        result = run_sql(sql).split(", ")
         Instructor(result[0], result[1], instructor_ID).assign_course_instructor(course_ID)
 
     def remove_for_instructor(self, instructor_ID, course_ID):
