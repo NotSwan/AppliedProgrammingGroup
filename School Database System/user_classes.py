@@ -1,8 +1,8 @@
 import sqlite3 as sql
 
 
-#db = sql.connect("data2.db")
-db = sql.connect("School Database System/data2.db")
+db = sql.connect("data2.db")
+#db = sql.connect("School Database System/data2.db")
 
 
 
