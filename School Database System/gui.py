@@ -1,3 +1,4 @@
+from glob import glob
 from tkinter import *
 from tkinter import ttk
 from user_classes import *
@@ -47,8 +48,8 @@ def login_frame():
     global loginFrame
     global username
     global password
-    username = StringVar(master=master, value="haynese")
-    password = StringVar(master=master, value="password")
+    username = StringVar(master=master, value="")
+    password = StringVar(master=master, value="")
 
     menuFrame.grid_remove()
     loginFrame = LabelFrame(master, text="Please Login to CURSE", foreground="#8052a1", background="#71b3c7")
@@ -175,91 +176,94 @@ def search_rosters():
     btn.grid(column=0, row=2, padx=10,pady=5)
         
 def link_unlink():
-#######################################################
-# Link_unlink breaks up into student link and 
-# instructor link each with two callbacks for add and  
-# removing the target from courses
-#######################################################
     mainMenuFrame.grid_remove()
     linkFrame = LabelFrame(master, text="Link/Unlink", foreground="#8052a1", background="#71b3c7")
     linkFrame.grid(column=0,row=0,sticky=(N,E,W,S))
     button0 = ttk.Button(linkFrame, text="Student Menu", command=student_link)
-    button1 = ttk.Button(linkFrame, text="Instructor Menu", command=instructor_link)
+    if(isinstance(user,Admin)):
+        button1 = ttk.Button(linkFrame, text="Instructor Menu", command=instructor_link)
+        button1.grid(column=2, row=0, padx=10,pady=5)
     button2 = ttk.Button(linkFrame, text="Menu", command=main_menu)
     button0.grid(column=0, row=0, padx=10, pady=5)
-    button1.grid(column=2, row=0, padx=10,pady=5)
     button2.grid(column=1, row=1, padx=10,pady=5)
 
-    def student_link():
-        def add_std_callback():
-            if(isinstance(user, Admin)):
-                temp = user.enroll_for_student(ID.get(), classID.get())
-            elif(isinstance(user, Student)):
-                temp = user.enroll(classID.get())
-            lbl = ttk.Label(link, text=temp, style='ST.TLabel')
-            lbl.grid(column=0,row=3,padx=10,pady=5)
-            
-        def rmv_std_callback():
-            if(isinstance(user, Admin)):
-                temp = user.drop_for_student(ID.get(),classID.get()) 
-            elif(isinstance(user, Student)):
-                temp = user.drop(classID.get())
-            lbl = ttk.Label(link, text=temp, style='ST.TLabel')
-            lbl.grid(column=0,row=3,padx=10,pady=5)
-        
-        link = LabelFrame(master, text="Student Link/Unlink", foreground="#8052a1", background="#71b3c7")
-        link.grid(column=0,row=0,sticky=(N,E,W,S))
-        
+def student_link():
+    def add_std_callback():
         if(isinstance(user, Admin)):
-            lbl = ttk.Label(link, text="Student ID: ", style='ST.TLabel')
-            lbl.grid(column=0,row=0,padx=10,pady=5)
-            ent1 = ttk.Entry(link, textvariable=ID)
-            ent1.grid(column=1,row=0,padx=10,pady=5)
-        lbl = ttk.Label(link, text="CRN: ", style='ST.TLabel')
-        lbl.grid(column=0,row=1,padx=10,pady=5)
-        
-        ID = StringVar(link,"")
-        classID = StringVar(link, "")
-        
-        ent2 = ttk.Entry(link, textvariable=classID)
-        ent2.grid(column=1,row=1,padx=10,pady=5)
-        
-        add = ttk.Button(link, text="Add",command=add_std_callback)
-        add.grid(column=2,row=0,padx=10,pady=5, sticky=E)
-        rmv = ttk.Button(link, text="Remove",command=rmv_std_callback)
-        rmv.grid(column=2,row=1,padx=10,pady=5, sticky=E)
-        
-        btn = ttk.Button(link, text="Return", command=link_unlink)
-        btn.grid(column=2, row=2, padx=10,pady=5)
-        
-    def instructor_link():
-        def add_inst_callback():
-            user.assign_for_instructor(ID.get(), classID.get())
-        def rmv_inst_callback():
-            user.remove_for_instructor(ID.get(), classID.get())
-            
-        link = LabelFrame(master, text="Instructor Link/Unlink", foreground="#8052a1", background="#71b3c7")
-        link.grid(column=0,row=0,sticky=(N,E,W,S))
-        
-        lbl = ttk.Label(link, text="Instructor ID: ", style='ST.TLabel')
+            temp = user.enroll_for_student(ID.get(), classID.get())
+        elif(isinstance(user, Student)):
+            temp = user.enroll(classID.get())
+        lbl = ttk.Label(link, text=temp, style='ST.TLabel')
+        lbl.grid(column=0,row=3,padx=10,pady=5)
+
+    def rmv_std_callback():
+        if(isinstance(user, Admin)):
+            temp = user.drop_for_student(ID.get(),classID.get()) 
+        elif(isinstance(user, Student)):
+            temp = user.drop(classID.get())
+        lbl = ttk.Label(link, text=temp, style='ST.TLabel')
+        lbl.grid(column=0,row=3,padx=10,pady=5)
+
+    link = LabelFrame(master, text="Student Link/Unlink", foreground="#8052a1", background="#71b3c7")
+    link.grid(column=0,row=0,sticky=(N,E,W,S))
+    ID = StringVar(link,"")
+    classID = StringVar(link, "")
+    if(isinstance(user, Admin)):
+        lbl = ttk.Label(link, text="Student ID: ", style='ST.TLabel')
         lbl.grid(column=0,row=0,padx=10,pady=5)
-        lbl = ttk.Label(link, text="CRN: ", style='ST.TLabel')
-        lbl.grid(column=0,row=1,padx=10,pady=5)
-        
-        ID = StringVar(link,"")
-        classID = StringVar(link, "")
         ent1 = ttk.Entry(link, textvariable=ID)
         ent1.grid(column=1,row=0,padx=10,pady=5)
-        ent2 = ttk.Entry(link, textvariable=classID)
-        ent2.grid(column=1,row=1,padx=10,pady=5)
+    lbl = ttk.Label(link, text="CRN: ", style='ST.TLabel')
+    lbl.grid(column=0,row=1,padx=10,pady=5)
+
+    
+
+    ent2 = ttk.Entry(link, textvariable=classID)
+    ent2.grid(column=1,row=1,padx=10,pady=5)
+
+    add = ttk.Button(link, text="Add",command=add_std_callback)
+    add.grid(column=2,row=0,padx=10,pady=5, sticky=E)
+    rmv = ttk.Button(link, text="Remove",command=rmv_std_callback)
+    rmv.grid(column=2,row=1,padx=10,pady=5, sticky=E)
+
+    btn = ttk.Button(link, text="Return", command=link_unlink)
+    btn.grid(column=2, row=2, padx=10,pady=5)
+
+
+
+def instructor_link():
+    global ID
+    global classID
+    global link
+    
+    def add_inst_callback():
+        user.assign_for_instructor(ID.get(), classID.get())
+    def rmv_inst_callback():
+        user.remove_for_instructor(ID.get(), classID.get())
         
-        add = ttk.Button(link, text="Add",command=add_inst_callback)
-        add.grid(column=2,row=0,padx=10,pady=5, sticky=E)
-        rmv = ttk.Button(link, text="Remove",command=rmv_inst_callback)
-        rmv.grid(column=2,row=1,padx=10,pady=5, sticky=E)
-        
-        btn = ttk.Button(link, text="Return", command=link_unlink)
-        btn.grid(column=2, row=2, padx=10,pady=5)
+    link = LabelFrame(master, text="Instructor Link/Unlink", foreground="#8052a1", background="#71b3c7")
+    link.grid(column=0,row=0,sticky=(N,E,W,S))
+
+    lbl = ttk.Label(link, text="Instructor ID: ", style='ST.TLabel')
+    lbl.grid(column=0,row=0,padx=10,pady=5)
+    lbl = ttk.Label(link, text="CRN: ", style='ST.TLabel')
+    lbl.grid(column=0,row=1,padx=10,pady=5)
+
+    ID = StringVar(link,"")
+    classID = StringVar(link, "")
+    ent1 = ttk.Entry(link, textvariable=ID)
+    ent1.grid(column=1,row=0,padx=10,pady=5)
+    ent2 = ttk.Entry(link, textvariable=classID)
+    ent2.grid(column=1,row=1,padx=10,pady=5)
+
+    add = ttk.Button(link, text="Add",command=add_inst_callback)
+    add.grid(column=2,row=0,padx=10,pady=5, sticky=E)
+    rmv = ttk.Button(link, text="Remove",command=rmv_inst_callback)
+    rmv.grid(column=2,row=1,padx=10,pady=5, sticky=E)
+
+    btn = ttk.Button(link, text="Return", command=link_unlink)
+    btn.grid(column=2, row=2, padx=10,pady=5)
+    
 
 def logout():
 #######################################################
